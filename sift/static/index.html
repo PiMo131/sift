@@ -4,7 +4,13 @@
 <meta charset="utf-8">
 <title>Sift</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f2328">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sift">
 <link rel="icon" href="/static/logo.svg">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
@@ -20,6 +26,7 @@
   </div>
   <div class="spacer"></div>
   <div id="topActions"></div>
+  <button class="btn" id="btnPhone" title="Opnames sturen vanaf je telefoon">📱 Telefoon</button>
 </div>
 
 <!-- ---------- projecten ---------- -->
@@ -44,6 +51,7 @@
           <div style="margin-top:14px"><button class="btn primary" id="btnCreate">Project aanmaken en starten</button></div>
           <div class="hw" id="hw"></div>
         </div>
+        <div class="card phone" id="phoneCard"></div>
       </div>
     </div>
   </div>

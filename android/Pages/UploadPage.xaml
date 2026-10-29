@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:s="clr-namespace:Sift.Services"
+             x:Class="Sift.Pages.UploadPage"
+             Title="{x:Static s:Strings.TabUpload}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="16" MaximumWidthRequest="560">
+            <Label Text="{x:Static s:Strings.UploadTitle}" Style="{StaticResource Title}" Margin="0,8,0,0" />
+            <Label Text="{x:Static s:Strings.UploadIntro}" Style="{StaticResource Muted}" LineBreakMode="WordWrap" />
+
+            <!-- not connected -->
+            <Border x:Name="NotConnectedCard" Style="{StaticResource Card}" IsVisible="False">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static s:Strings.ConnectFirst}" LineBreakMode="WordWrap" />
+                    <Button Text="{x:Static s:Strings.GoConnect}" Style="{StaticResource Secondary}" Clicked="OnGoConnect" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- file -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label x:Name="FileLabel" Text="{x:Static s:Strings.NoFile}" FontAttributes="Bold" LineBreakMode="MiddleTruncation" />
+                    <Label x:Name="FileInfoLabel" Style="{StaticResource Muted}" IsVisible="False" />
+                    <Button x:Name="PickButton" Text="{x:Static s:Strings.PickFile}" Style="{StaticResource Secondary}" Clicked="OnPick" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- options -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static s:Strings.ProjectName}" Style="{StaticResource Muted}" />
+                    <Entry x:Name="NameEntry" ReturnType="Done" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,6,0,0">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="{x:Static s:Strings.AutoStart}" />
+                            <Label Text="{x:Static s:Strings.AutoStartHint}" Style="{StaticResource Muted}" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="AutoStartSwitch" Grid.Column="1" IsToggled="True" VerticalOptions="Center" OnColor="{StaticResource Accent}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- send -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Button x:Name="SendButton" Text="{x:Static s:Strings.Send}" Clicked="OnSend" IsEnabled="False" />
+                    <ProgressBar x:Name="Progress" IsVisible="False" />
+                    <Label x:Name="ProgressLabel" Style="{StaticResource Muted}" IsVisible="False" />
+                    <Button x:Name="CancelButton" Text="{x:Static s:Strings.Cancel}" Style="{StaticResource Secondary}" Clicked="OnCancel" IsVisible="False" />
+                    <Label x:Name="MessageLabel" IsVisible="False" LineBreakMode="WordWrap" />
+                    <Button x:Name="OpenButton" Text="{x:Static s:Strings.OpenProject}" Clicked="OnOpen" IsVisible="False" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

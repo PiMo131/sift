@@ -1,0 +1,123 @@
+name: Android APK
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version from sift/__init__.py
+        id: ver
+        shell: bash
+        run: |
+          v=$(sed -n 's/^__version__ *= *"\([^"]*\)".*/\1/p' sift/__init__.py)
+          [ -n "$v" ] || { echo "__version__ not found"; exit 1; }
+          IFS=. read -r a b c <<< "$(echo "$v" | sed 's/[^0-9.].*$//')"
+          code=$(( ${a:-0} * 10000 + ${b:-0} * 100 + ${c:-0} ))
+          [ "$code" -ge 1 ] || code=1
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "Sift $v (versionCode $code)"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: microsoft
+          java-version: "17"
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-34 build-tools;34.0.0"
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
+
+      - name: Restore
+        run: dotnet restore android/Sift.csproj
+
+      - name: Install missing Android SDK parts
+        run: >
+          dotnet build android/Sift.csproj -f net8.0-android -t:InstallAndroidDependencies
+          -p:AndroidSdkDirectory=$ANDROID_HOME -p:JavaSdkDirectory=$JAVA_HOME -p:AcceptAndroidSDKLicenses=True
+
+      - name: Prepare signing
+        id: sign
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/sift.keystore"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Signing with keystore from secrets."
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "No ANDROID_KEYSTORE_B64 secret: building a debug-signed APK."
+          fi
+
+      - name: Publish APK
+        shell: bash
+        env:
+          SIGNED: ${{ steps.sign.outputs.signed }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          args=(android/Sift.csproj -f net8.0-android -c Release
+                -p:ApplicationDisplayVersion=${{ steps.ver.outputs.version }}
+                -p:ApplicationVersion=${{ steps.ver.outputs.code }}
+                -p:AndroidSdkDirectory=$ANDROID_HOME -p:JavaSdkDirectory=$JAVA_HOME)
+          if [ "$SIGNED" = "true" ]; then
+            # env:NAME makes MSBuild read the password from the environment instead of the command line
+            args+=(-p:AndroidKeyStore=true
+                   "-p:AndroidSigningKeyStore=$RUNNER_TEMP/sift.keystore"
+                   "-p:AndroidSigningKeyAlias=$ANDROID_KEY_ALIAS"
+                   -p:AndroidSigningKeyPass=env:ANDROID_KEY_PASSWORD
+                   -p:AndroidSigningStorePass=env:ANDROID_KEYSTORE_PASSWORD)
+          fi
+          dotnet publish "${args[@]}"
+          apk=$(ls android/bin/Release/net8.0-android/publish/*-Signed.apk | head -1)
+          [ -f "$apk" ] || { echo "no signed APK found"; exit 1; }
+          mkdir -p dist
+          cp "$apk" "dist/Sift-${{ steps.ver.outputs.version }}.apk"
+          ls -l dist
+
+      - name: Job summary
+        shell: bash
+        run: |
+          size=$(du -h dist/Sift-${{ steps.ver.outputs.version }}.apk | cut -f1)
+          {
+            echo "## Sift ${{ steps.ver.outputs.version }} Android"
+            echo
+            echo "- APK: \`Sift-${{ steps.ver.outputs.version }}.apk\` ($size)"
+            if [ "${{ steps.sign.outputs.signed }}" = "true" ]; then
+              echo "- Gesigneerd met de release-keystore uit de secrets."
+            else
+              echo "- **Debug-gesigneerd**: er is geen \`ANDROID_KEYSTORE_B64\` secret. Installeren werkt, maar updates over een later release-gesigneerde versie heen vragen eerst deïnstallatie. Voeg de secrets \`ANDROID_KEYSTORE_B64\`, \`ANDROID_KEYSTORE_PASSWORD\`, \`ANDROID_KEY_ALIAS\` en \`ANDROID_KEY_PASSWORD\` toe voor een release-build."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sift-${{ steps.ver.outputs.version }}-apk
+          path: dist/Sift-${{ steps.ver.outputs.version }}.apk
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Sift-${{ steps.ver.outputs.version }}.apk

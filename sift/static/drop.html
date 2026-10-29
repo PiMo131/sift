@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sift · opname sturen</title>
+<meta name="theme-color" content="#1f2328">
+<link rel="icon" href="/static/logo.svg">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<style>
+  :root{--bg:#f6f5f1;--card:#fff;--fg:#1f2328;--muted:#6b7280;--line:#e6e3dc;--accent:#2f855a;--accent-bg:#e6f4ea;--err:#b42318;--rec:#e05252}
+  @media (prefers-color-scheme: dark){:root{--bg:#15181c;--card:#1f2328;--fg:#e8e6e1;--muted:#9aa0a8;--line:#343a42;--accent-bg:#1d3a2a}}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  h1{font-size:1.5rem;margin:8px 0 2px;display:flex;align-items:center;gap:10px}
+  h1 img{width:34px;height:34px;border-radius:8px}
+  .sub{color:var(--muted);margin:0 0 16px;text-align:center;font-size:.95rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:520px;margin-bottom:14px}
+  label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  input[type=text],input[type=tel]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);font-size:1rem}
+  input[type=tel]{letter-spacing:.4em;font-size:1.5rem;text-align:center}
+  .row{display:flex;gap:12px}.row>*{flex:1}
+  .sw{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:.95rem;cursor:pointer;min-height:36px}
+  .sw input{width:22px;height:22px;margin:0;accent-color:var(--accent)}
+  #zone{border:2px dashed var(--line);border-radius:16px;padding:30px 16px;text-align:center;cursor:pointer;transition:.15s}
+  #zone.over{border-color:var(--accent);background:var(--accent-bg)}
+  #zone .big{font-size:2.6rem;line-height:1}
+  #zone p{margin:10px 0 0;color:var(--muted)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;font-weight:600;cursor:pointer;width:100%}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.rec{background:var(--rec);border-color:var(--rec);color:#fff}
+  .btn:disabled{opacity:.5}
+  .dot{width:12px;height:12px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .elapsed{font-variant-numeric:tabular-nums;font-size:2.2rem;text-align:center;margin:8px 0 12px;font-weight:600}
+  .level{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:14px}.level i{display:block;height:100%;width:0;background:var(--accent);transition:width .08s}
+  ul{list-style:none;padding:0;margin:0}
+  li{padding:10px 0;border-bottom:1px solid var(--line)}li:last-child{border-bottom:0}
+  .name{display:flex;justify-content:space-between;gap:12px;font-size:.95rem;word-break:break-all}.name span:last-child{color:var(--muted);white-space:nowrap}
+  .bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+  .ok .bar i{background:var(--accent)}.err .bar i{background:var(--err)}
+  .msg{font-size:.85rem;margin-top:5px;color:var(--muted)}.err .msg{color:var(--err)}
+  .msg a{color:var(--accent);font-weight:600}
+  .hint{font-size:.85rem;color:var(--muted);margin-top:8px}
+  .hidden{display:none!important}
+  footer{color:var(--muted);font-size:.8rem;margin-top:auto;padding:14px;text-align:center}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<h1><img src="/static/logo.svg" alt=""><span>Sift</span></h1>
+<p class="sub">Stuur een opname naar de computer; die verschijnt daar als project.</p>
+
+<div class="card">
+  <div class="row">
+    <div><label for="code">Code (staat op de computer)</label><input type="tel" id="code" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"></div>
+  </div>
+  <label for="pname" style="margin-top:12px">Projectnaam (optioneel)</label>
+  <input type="text" id="pname" maxlength="80" placeholder="bijv. interview R04">
+  <label class="sw"><input type="checkbox" id="auto" checked> Direct transcriberen met de standaardinstellingen</label>
+</div>
+
+<div class="card" id="reccard">
+  <label>Opnemen met deze telefoon</label>
+  <div id="recIdle">
+    <button class="btn rec" id="btnRec">● Opname starten</button>
+    <div class="hint" id="recHint">De opname blijft op de telefoon tot je stopt; daarna wordt hij verstuurd.</div>
+  </div>
+  <div id="recBusy" class="hidden">
+    <div class="elapsed" id="elapsed">00:00</div>
+    <div class="level"><i id="lvl"></i></div>
+    <div class="row"><button class="btn" id="btnPauseRec">Pauze</button><button class="btn primary" id="btnStop"><span class="dot"></span> Stoppen en versturen</button></div>
+  </div>
+</div>
+
+<div class="card">
+  <div id="zone">
+    <div class="big">&#127908;</div>
+    <p>Tik om een opname te kiezen</p>
+    <p class="hint" style="margin-top:4px">mp3, m4a, wav, mp4, WhatsApp-audio …</p>
+    <input type="file" id="file" accept="audio/*,video/*" class="hidden">
+  </div>
+</div>
+
+<div class="card hidden" id="listcard"><ul id="list"></ul></div>
+
+<footer id="target"></footer>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const codeEl = $('code'), nameEl = $('pname'), autoEl = $('auto'), zone = $('zone'), fileEl = $('file'), list = $('list');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = b => b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : b < 1073741824 ? (b / 1048576).toFixed(1) + ' MB' : (b / 1073741824).toFixed(2) + ' GB';
+const mmss = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const cookie = n => (document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)')) || [])[1];
+
+const params = new URLSearchParams(location.search);
+if (params.get('code')) { codeEl.value = params.get('code'); try { localStorage.code = codeEl.value; } catch (e) {} history.replaceState(null, '', location.pathname); }
+else { let c = null; try { c = localStorage.code; } catch (e) {} codeEl.value = c || cookie('sift_code') || ''; }
+codeEl.addEventListener('input', () => { try { localStorage.code = codeEl.value; } catch (e) {} });
+$('target').innerHTML = `Versturen naar <b>${esc(location.host)}</b> · zelfde wifi vereist · <a href="/">open Sift</a>`;
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+function needCode() {
+  if (/^\d{4}$/.test(codeEl.value)) return true;
+  codeEl.focus(); codeEl.style.borderColor = 'var(--err)'; setTimeout(() => codeEl.style.borderColor = '', 1200); return false;
+}
+
+/* ---------- bestand kiezen ---------- */
+zone.addEventListener('click', () => { if (needCode()) fileEl.click(); });
+fileEl.addEventListener('change', () => { send([...fileEl.files]); fileEl.value = ''; });
+['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('over'); }));
+zone.addEventListener('drop', e => send([...e.dataTransfer.files]));
+
+async function send(files) {
+  if (!files.length || !needCode()) return;
+  $('listcard').classList.remove('hidden');
+  for (const f of files) await upload(f, nameEl.value.trim());
+}
+
+function upload(f, name) {
+  return new Promise(resolve => {
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="name"><span>${esc(f.name)}</span><span>${fmt(f.size)}</span></div><div class="bar"><i></i></div><div class="msg">Versturen…</div>`;
+    list.prepend(li);
+    const bar = li.querySelector('i'), msg = li.querySelector('.msg');
+    const fd = new FormData();
+    fd.append('file', f, f.name); fd.append('name', name || ''); fd.append('autostart', autoEl.checked ? '1' : '0');
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/drop');
+    xhr.setRequestHeader('X-Sift-Code', codeEl.value);
+    xhr.upload.onprogress = e => { if (e.lengthComputable) { const p = e.loaded / e.total; bar.style.width = (p * 100) + '%'; msg.textContent = p < 1 ? `Versturen… ${Math.round(p * 100)}%` : 'Verwerken op de computer…'; } };
+    xhr.onload = () => {
+      bar.style.width = '100%';
+      if (xhr.status === 200) {
+        let r = {}; try { r = JSON.parse(xhr.responseText); } catch (e) {}
+        li.classList.add('ok');
+        msg.innerHTML = `Ontvangen als project <b>${esc(r.name || '')}</b>${r.autostart ? ', transcriptie gestart' : ''}. <a href="/?code=${encodeURIComponent(codeEl.value)}#p=${encodeURIComponent(r.id || '')}&v=pipeline">Open in Sift</a>`;
+      } else {
+        li.classList.add('err');
+        msg.textContent = { 401: 'Verkeerde code', 403: 'Sift is op de computer niet opengesteld voor het netwerk (knop Telefoon)', 413: 'Te groot (max 2 GB)', 429: 'Te veel verkeerde codes, wacht een minuut' }[xhr.status] || `Mislukt (${xhr.status})`;
+      }
+      resolve();
+    };
+    xhr.onerror = () => { li.classList.add('err'); msg.textContent = 'Mislukt: geen verbinding met de computer'; resolve(); };
+    xhr.send(fd);
+  });
+}
+
+/* ---------- opnemen in de browser ---------- */
+let rec = null, chunks = [], t0 = 0, pausedAt = 0, timer = null, stream = null, actx = null, raf = null;
+const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/ogg;codecs=opus'].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+if (!navigator.mediaDevices || !window.MediaRecorder) {
+  $('btnRec').disabled = true;
+  $('recHint').innerHTML = window.isSecureContext
+    ? 'Deze browser ondersteunt geen opname in de browser. Neem op met de recorder-app en kies het bestand hieronder.'
+    : 'Opnemen in de browser werkt alleen via https of localhost; via het wifi-adres blokkeert de browser de microfoon. Neem op met de recorder-app van je telefoon (of de Sift-app) en kies het bestand hieronder.';
+}
+$('btnRec').onclick = async () => {
+  if (!needCode()) return;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }); }
+  catch (e) { $('recHint').textContent = 'Geen toegang tot de microfoon: ' + e.message; return; }
+  chunks = []; rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 96000 } : undefined);
+  rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  rec.onstop = finishRecording;
+  rec.start(1000);
+  t0 = Date.now(); pausedAt = 0;
+  $('recIdle').classList.add('hidden'); $('recBusy').classList.remove('hidden');
+  timer = setInterval(() => $('elapsed').textContent = mmss((Date.now() - t0) / 1000), 250);
+  try { actx = new (window.AudioContext || window.webkitAudioContext)(); const src = actx.createMediaStreamSource(stream); const an = actx.createAnalyser(); an.fftSize = 512; src.connect(an); const buf = new Uint8Array(an.fftSize);
+    const tick = () => { an.getByteTimeDomainData(buf); let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v - 128)); $('lvl').style.width = Math.min(100, m / 128 * 160) + '%'; raf = requestAnimationFrame(tick); }; tick(); } catch (e) {}
+  try { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
+};
+$('btnPauseRec').onclick = () => {
+  if (!rec) return;
+  if (rec.state === 'recording') { rec.pause(); pausedAt = Date.now(); clearInterval(timer); $('btnPauseRec').textContent = 'Hervatten'; }
+  else if (rec.state === 'paused') { rec.resume(); t0 += Date.now() - pausedAt; timer = setInterval(() => $('elapsed').textContent = mmss((Date.now() - t0) / 1000), 250); $('btnPauseRec').textContent = 'Pauze'; }
+};
+$('btnStop').onclick = () => { if (rec && rec.state !== 'inactive') rec.stop(); };
+window.addEventListener('beforeunload', e => { if (rec && rec.state !== 'inactive') { e.preventDefault(); e.returnValue = ''; } });
+
+function finishRecording() {
+  clearInterval(timer); cancelAnimationFrame(raf);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (actx) { actx.close().catch(() => {}); actx = null; }
+  const type = rec.mimeType || mime || 'audio/webm';
+  const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+  const d = new Date(), pad = n => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}${pad(d.getMinutes())}`;
+  const blob = new Blob(chunks, { type });
+  const file = new File([blob], `opname ${stamp}.${ext}`, { type });
+  rec = null; chunks = [];
+  $('recBusy').classList.add('hidden'); $('recIdle').classList.remove('hidden'); $('elapsed').textContent = '00:00'; $('btnPauseRec').textContent = 'Pauze';
+  if (blob.size < 1000) { $('recHint').textContent = 'Opname was leeg.'; return; }
+  send([file]);
+}
+</script>
+</body>
+</html>

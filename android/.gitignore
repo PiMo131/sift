@@ -1,0 +1,13 @@
+# build output
+bin/
+obj/
+dist/
+.build/
+*.user
+.vs/
+.idea/
+
+# signing: nooit meesturen
+Signing.props
+*.keystore
+*.jks

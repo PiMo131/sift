@@ -55,7 +55,42 @@ async function loadHome() {
     box.innerHTML = models.map(([id, m]) => `<label class="cb"><input type="checkbox" value="${id}" ${S.info.defaults.models.includes(id) ? 'checked' : ''}> ${esc(m.label)} <small>· ${esc(m.note)}</small></label>`).join('') + `<label class="cb" style="border-color:var(--accent)"><input type="checkbox" id="newAll"> <b>Allemaal</b></label>`;
     $('#newAll').onchange = e => $$('#newModels input[type=checkbox]:not(#newAll)').forEach(c => c.checked = e.target.checked);
   }
+  renderPhoneCard();
 }
+
+/* ======================= telefoon (LAN + QR) ======================= */
+async function renderPhoneCard() {
+  const card = $('#phoneCard'); if (!card) return;
+  if (!S.lanOk) { card.classList.remove('hidden'); card.innerHTML = `<h5 style="margin:0 0 4px">Opname sturen vanaf deze telefoon</h5><div class="sub" style="margin-bottom:8px">Kies een opname of neem er een op; die verschijnt op de computer als project.</div><a class="btn primary" href="/drop" style="display:inline-flex;text-decoration:none">Opname kiezen of opnemen</a>`; return; }
+  let l; try { l = await api('/lan'); } catch (e) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  card.innerHTML = `<div class="ph"><img src="/api/lan/qr.svg?${Date.now()}" alt="QR" class="qr small"><div style="flex:1;min-width:0"><h5 style="margin:0 0 4px">Vanaf je telefoon</h5>
+    <div class="sub" style="margin-bottom:6px">Scan de QR op hetzelfde wifi, kies of maak een opname; die verschijnt hier als project.</div>
+    <div class="code">${esc(l.code)}</div><div class="url">${esc(l.url.replace(/\?code=.*/, ''))}</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px"><label class="cb"><input type="checkbox" id="phCardLan" ${l.enabled ? 'checked' : ''}> bereikbaar op het netwerk</label><button class="btn small" id="phCardMore">Details en QR groot</button></div></div></div>`;
+  $('#phCardLan').onchange = async e => { await post('/lan/enable', { enabled: e.target.checked }); toast(e.target.checked ? 'Sift is bereikbaar op het netwerk' : 'Netwerktoegang uit'); };
+  $('#phCardMore').onclick = phoneModal;
+}
+async function phoneModal() {
+  let l; try { l = await api('/lan'); } catch (e) { return toast('Alleen beschikbaar op de computer zelf'); }
+  const m = modal('');
+  const fw = { allowed: 'Windows Firewall laat Sift door.', blocked: '<b style="color:var(--warn)">Windows Firewall blokkeert Sift.</b> Verwijder de blokkeerregel voor python.exe in "Windows Defender Firewall → Toegestane apps" of sta hem toe.', none: 'Windows Firewall kan bij de eerste verbinding een melding tonen; kies dan <b>Toegang toestaan</b> (privénetwerken).', unknown: 'Controleer bij problemen of de firewall Sift toelaat.' };
+  const render = () => {
+    m.querySelector('.box').innerHTML = `<h3>Vanaf je telefoon</h3>
+      <div class="sub">Scan de QR met de camera van je telefoon. Daar kies je een opname of neem je er een op; die verschijnt hier als project en wordt (optioneel) direct getranscribeerd. Transcripten nakijken kan ook op de telefoon.</div>
+      <label class="cb" style="display:inline-flex;margin-bottom:12px"><input type="checkbox" id="phLan" ${l.enabled ? 'checked' : ''}> <b>Bereikbaar op het netwerk</b>&nbsp;<small>(${l.enabled ? 'aan' : 'uit: telefoon krijgt "LAN uit"'})</small></label>
+      <div class="ph big"><img src="/api/lan/qr.svg?${Date.now()}" alt="QR" class="qr"><div>
+        <div class="lbl">Adres</div><div class="url">${esc((l.url || '').replace(/\?code=.*/, ''))}</div>
+        <div class="lbl" style="margin-top:10px">Code</div><div class="code">${esc(l.code)}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" id="phNew">Nieuwe code</button><button class="btn" id="phCopy">Kopieer link</button></div></div></div>
+      <div class="sub" style="margin-top:12px">Zelfde wifi vereist (geen gasten-netwerk). ${l.ip ? `Dit adres is ${esc(l.ip)}${l.ips && l.ips.length > 1 ? ' (andere: ' + l.ips.slice(1).map(esc).join(', ') + ')' : ''}.` : '<b style="color:var(--warn)">Geen netwerkadres gevonden.</b>'} ${fw[l.firewall] || fw.unknown} Start Sift met <span class="kbd">--lan</span> om netwerktoegang meteen aan te zetten.</div>`;
+    $('#phLan').onchange = async e => { l = await post('/lan/enable', { enabled: e.target.checked }); render(); toast(l.enabled ? 'Sift is bereikbaar op het netwerk' : 'Netwerktoegang uit'); renderPhoneCard(); };
+    $('#phNew').onclick = async () => { l = await post('/lan/newcode'); render(); toast('Nieuwe code: ' + l.code); renderPhoneCard(); };
+    $('#phCopy').onclick = async () => { try { await navigator.clipboard.writeText(l.url); toast('Link gekopieerd'); } catch (e) { prompt('Kopieer de link', l.url); } };
+  };
+  render();
+}
+$('#btnPhone').onclick = phoneModal;
 let newFile = null;
 const drop = $('#drop');
 drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
@@ -152,7 +187,8 @@ function renderEditor() {
   $('#editor').classList.toggle('heat', S.heat);
   $('#editor').innerHTML = `<div class="toolbar">
       <button class="btn small" id="tbSpk">Spreker wijzigen</button><button class="btn small" id="tbTs">Tijdcode invoegen</button><button class="btn small" id="tbHl">Markeren</button><button class="btn small" id="tbUnv">[onverstaanbaar]</button><button class="btn small" id="tbPause">(pauze)</button><button class="btn small" id="tbNote">Opmerking</button><button class="btn small" id="tbOk">✓ Nagekeken</button><button class="btn small" id="tbSplit" title="Enter">Splitsen</button><button class="btn small" id="tbMerge" title="Backspace aan begin">Samenvoegen</button>
-      <span style="margin-left:auto">volgend onzeker <span class="kbd">Tab</span> · volgend meningsverschil <span class="kbd">Shift+Tab</span></span></div>
+      <span class="nav"><button class="btn small" id="tbNextUnc" title="Tab">Volgend onzeker ↓</button><button class="btn small" id="tbNextDis" title="Shift+Tab">Volgend meningsverschil ↓</button></span>
+      <span class="mob"><button class="btn small" id="tbSide">Sprekers</button><button class="btn small" id="tbRight">Woord</button></span></div>
     <div id="segs">${S.tr.segments.map(segHtml).join('')}</div>`;
   bindEditor();
   renderSide(); renderRight();
@@ -185,6 +221,10 @@ function bindEditor() {
   $('#tbOk').onclick = () => toggleFlag('reviewed', true);
   $('#tbSplit').onclick = () => S.curSeg != null && splitAtCaret(S.curSeg);
   $('#tbMerge').onclick = () => S.curSeg != null && S.curSeg > 0 && mergeWithPrevious(S.curSeg);
+  $('#tbNextUnc').onclick = () => { if (S.curSeg != null) commitSegment(S.curSeg); nextWord(w => w.p != null && w.p < S.threshold); };
+  $('#tbNextDis').onclick = () => { if (S.curSeg != null) commitSegment(S.curSeg); nextWord(w => w.disagree); };
+  $('#tbSide').onclick = () => { $('#right').classList.remove('open'); $('#side').classList.toggle('open'); };
+  $('#tbRight').onclick = () => { $('#side').classList.remove('open'); $('#right').classList.toggle('open'); };
 }
 function renderSide() {
   const segs = S.tr.segments, words = segs.flatMap(s => s.words || []);
@@ -401,7 +441,7 @@ async function renderCompare() {
   const pct = k => stats.n ? Math.round(stats[k] / stats.n * 100) + '%' : '–';
   $('#cmp').innerHTML = `<h2 style="margin:0 0 4px">Modellen vergelijken</h2><div class="sub">${models.length} model(len), per segment op tijd uitgelijnd. Klik een woord in een modelrij om die variant in het transcript te zetten. Oranje wijkt af van het transcript, rood heeft geen meerderheid.</div>
     <div class="legend"><span><i style="background:var(--accent-bg);border-bottom:2px solid var(--accent)"></i>In transcript</span><span><i style="background:var(--c2b);border-bottom:2px solid var(--c2)"></i>Wijkt af</span><span><i style="background:var(--c1b);border-bottom:2px solid var(--c1)"></i>Geen meerderheid</span></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px"><div class="card"><small>Alle modellen eens</small><div style="font-size:22px;font-weight:700">${pct('all')}</div></div><div class="card"><small>Meerderheid</small><div style="font-size:22px;font-weight:700">${pct('maj')}</div></div><div class="card"><small>Geen meerderheid</small><div style="font-size:22px;font-weight:700;color:var(--warn)">${pct('none')}</div><small>${stats.none} woorden</small></div><div class="card"><small>Segmenten</small><div style="font-size:22px;font-weight:700">${segs.length}</div></div></div>
+    <div class="stats"><div class="card"><small>Alle modellen eens</small><div style="font-size:22px;font-weight:700">${pct('all')}</div></div><div class="card"><small>Meerderheid</small><div style="font-size:22px;font-weight:700">${pct('maj')}</div></div><div class="card"><small>Geen meerderheid</small><div style="font-size:22px;font-weight:700;color:var(--warn)">${pct('none')}</div><small>${stats.none} woorden</small></div><div class="card"><small>Segmenten</small><div style="font-size:22px;font-weight:700">${segs.length}</div></div></div>
     <div class="card"><h5>Overeenstemming over het hele interview (klik om te springen)</h5><div class="tl">${tl.map((c, i) => `<i class="${c}" data-i="${i}" title="${fmtHMS(segs[i].start)}"></i>`).join('')}</div></div>
     <label class="cb" style="display:inline-flex;margin-bottom:10px"><input type="checkbox" id="cmpOnly" checked> alleen segmenten met verschillen</label>
     <div id="cmpList"></div>`;
@@ -462,7 +502,9 @@ function renderExport() {
 
 /* ======================= start ======================= */
 (async () => {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
   S.info = await api('/info');
+  try { await api('/lan'); S.lanOk = true; } catch (e) { S.lanOk = false; $('#btnPhone').classList.add('hidden'); }
   const h = new URLSearchParams(location.hash.slice(1));
   if (h.get('p')) { try { await openProject(h.get('p')); if (h.get('v')) show(h.get('v')); return; } catch (e) { toast('Project niet gevonden'); } }
   show('home');

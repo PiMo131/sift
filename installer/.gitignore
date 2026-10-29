@@ -1,0 +1,5 @@
+.build/
+dist/
+launcher/bin/
+launcher/obj/
+__pycache__/

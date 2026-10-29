@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:s="clr-namespace:Sift.Services"
+             x:Class="Sift.Pages.ConnectPage"
+             Title="{x:Static s:Strings.TabConnect}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="16" MaximumWidthRequest="560">
+
+            <HorizontalStackLayout Spacing="12" Margin="0,8,0,0">
+                <Image Source="sift_logo.png" WidthRequest="40" HeightRequest="40" />
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Text="{x:Static s:Strings.AppName}" Style="{StaticResource Title}" />
+                    <Label Text="{x:Static s:Strings.Tagline}" Style="{StaticResource Muted}" />
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+
+            <!-- status -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <Ellipse x:Name="Dot" Grid.Column="0" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" Fill="#9ca3af" />
+                    <Label x:Name="StatusLabel" Grid.Column="1" Text="{x:Static s:Strings.NotConnected}" FontAttributes="Bold" VerticalOptions="Center" LineBreakMode="WordWrap" />
+                    <Button x:Name="ForgetButton" Grid.Column="2" Text="{x:Static s:Strings.Forget}" Style="{StaticResource Secondary}" Clicked="OnForget" IsVisible="False" Padding="12,6" MinimumHeightRequest="36" />
+                </Grid>
+            </Border>
+
+            <!-- connect -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{x:Static s:Strings.ConnectTitle}" FontSize="17" FontAttributes="Bold" />
+                    <Label Text="{x:Static s:Strings.ConnectIntro}" Style="{StaticResource Muted}" LineBreakMode="WordWrap" />
+                    <Button Text="{x:Static s:Strings.ScanQr}" Clicked="OnScan" />
+
+                    <Label Text="{x:Static s:Strings.OrManual}" Style="{StaticResource Muted}" Margin="0,8,0,0" />
+                    <Label Text="{x:Static s:Strings.AddressLabel}" Style="{StaticResource Muted}" />
+                    <Entry x:Name="AddressEntry" Placeholder="{x:Static s:Strings.AddressPlaceholder}" Keyboard="Url" ReturnType="Next" />
+                    <Label Text="{x:Static s:Strings.CodeLabel}" Style="{StaticResource Muted}" />
+                    <Entry x:Name="CodeEntry" Placeholder="{x:Static s:Strings.CodePlaceholder}" Keyboard="Numeric" MaxLength="8" ReturnType="Done" Completed="OnTest" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Button x:Name="TestButton" Grid.Column="0" Text="{x:Static s:Strings.TestConnection}" Clicked="OnTest" />
+                        <ActivityIndicator x:Name="Busy" Grid.Column="1" IsRunning="False" IsVisible="False" WidthRequest="28" HeightRequest="28" />
+                    </Grid>
+                    <Label x:Name="MessageLabel" IsVisible="False" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="{x:Static s:Strings.SameWifiHint}" Style="{StaticResource Muted}" LineBreakMode="WordWrap" Margin="4,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

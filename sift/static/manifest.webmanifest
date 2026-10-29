@@ -1,0 +1,19 @@
+{
+  "name": "Sift",
+  "short_name": "Sift",
+  "description": "Lokale interviewtranscriptie: opnames sturen en transcripten nakijken",
+  "lang": "nl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#1f2328",
+  "icons": [
+    { "src": "/static/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Opname sturen", "short_name": "Opname", "url": "/drop", "icons": [{ "src": "/static/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

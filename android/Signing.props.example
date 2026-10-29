@@ -1,0 +1,14 @@
+<!-- Kopieer naar Signing.props en vul je eigen keystore in. Signing.props en *.keystore staan in .gitignore.
+     Keystore maken:
+       keytool -genkeypair -v -keystore sift.keystore -alias sift -keyalg RSA -keysize 2048 -validity 10000
+     Zonder Signing.props maakt build.ps1 een debug-gesigneerde APK (werkt prima om zelf te installeren).
+-->
+<Project>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>$(MSBuildThisFileDirectory)sift.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>sift</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>CHANGE_ME</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>CHANGE_ME</AndroidSigningStorePass>
+  </PropertyGroup>
+</Project>

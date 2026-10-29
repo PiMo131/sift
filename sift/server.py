@@ -3,19 +3,24 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, diarize, export, pipeline
+from . import __version__, diarize, export, lan, pipeline
 from .config import DEFAULT_SETTINGS, MODELS, PROJECTS_DIR, STATIC_DIR, hardware_info
 from .project import Project
 
 app = FastAPI(title="sift", version=__version__)
+app.add_middleware(lan.CodeMiddleware)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+MAX_DROP_BYTES = 2 * 1024 ** 3
 
 
 def _proj(pid: str) -> Project:
@@ -25,9 +30,117 @@ def _proj(pid: str) -> Project:
         raise HTTPException(404, "project niet gevonden")
 
 
+def _static_page(name: str, media_type: str = "text/html; charset=utf-8") -> Response:
+    return Response((STATIC_DIR / name).read_bytes(), media_type=media_type, headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+
+
+@app.get("/drop")
+def drop_page():
+    return _static_page("drop.html")
+
+
+@app.get("/manifest.webmanifest")
+def manifest():
+    return _static_page("manifest.webmanifest", "application/manifest+json")
+
+
+@app.get("/sw.js")
+def service_worker():
+    return _static_page("sw.js", "application/javascript")
+
+
+@app.get("/api/ping")
+def ping():
+    return {"app": "sift", "version": __version__, "lan": lan.state.enabled}
+
+
+# ---------- telefoon / LAN ----------
+def _loopback_only(request: Request):
+    if not lan.is_loopback(request.client.host if request.client else None):
+        raise HTTPException(403, "alleen vanaf deze computer")
+
+
+@app.get("/api/lan")
+def lan_info(request: Request):
+    _loopback_only(request)
+    return lan.info()
+
+
+@app.post("/api/lan/newcode")
+def lan_newcode(request: Request):
+    _loopback_only(request)
+    lan.state.regenerate()
+    return lan.info()
+
+
+@app.post("/api/lan/enable")
+async def lan_enable(request: Request, body: dict | None = None):
+    _loopback_only(request)
+    lan.state.enabled = bool((body or {}).get("enabled", True))
+    return lan.info()
+
+
+@app.get("/api/lan/qr.svg")
+def lan_qr(request: Request):
+    _loopback_only(request)
+    return Response(lan.qr_svg(lan.url()), media_type="image/svg+xml", headers={"Cache-Control": "no-store"})
+
+
+def _remux_if_needed(src: Path) -> Path:
+    """Browser-opnames (MediaRecorder) missen duur en cues in de container; een remux zonder hercoderen herstelt dat."""
+    if src.suffix not in (".webm", ".ogg", ".mkv"):
+        return src
+    from .config import find_ffmpeg
+    ff = find_ffmpeg()
+    if not ff:
+        return src
+    dst = src.with_name("remux" + src.suffix)
+    try:
+        r = subprocess.run([ff, "-hide_banner", "-loglevel", "error", "-y", "-i", str(src), "-c", "copy", str(dst)],
+                           capture_output=True, text=True, timeout=600)
+        if r.returncode == 0 and dst.exists() and dst.stat().st_size > 0:
+            return dst
+    except Exception:
+        pass
+    return src
+
+
+@app.post("/api/drop")
+async def drop(request: Request, file: UploadFile = File(...), name: str = Form(""), autostart: str = Form("0")):
+    """Opname van de telefoon: streamt naar schijf, maakt een project en start optioneel de pipeline."""
+    length = request.headers.get("content-length")
+    if length and int(length) > MAX_DROP_BYTES + 65536:
+        raise HTTPException(413, "bestand te groot (max 2 GB)")
+    fname = Path(file.filename or "opname").name or "opname"
+    suffix = Path(fname).suffix.lower() or ".bin"
+    tmpdir = Path(tempfile.mkdtemp(prefix="sift_drop_"))
+    tmp = tmpdir / ("upload" + suffix)
+    total = 0
+    try:
+        with open(tmp, "wb") as f:
+            while True:
+                chunk = await file.read(1 << 20)
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > MAX_DROP_BYTES:
+                    raise HTTPException(413, "bestand te groot (max 2 GB)")
+                f.write(chunk)
+        if total == 0:
+            raise HTTPException(400, "leeg bestand")
+        name = (name or "").strip() or f"{Path(fname).stem} {datetime.now():%Y-%m-%d %H:%M}"
+        tmp = _remux_if_needed(tmp)
+        p = Project.create(name, tmp, {})
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+    if autostart in ("1", "true", "on", "yes"):
+        pipeline.start(p)
+    return {"id": p.name, "name": name, "bytes": total, "autostart": autostart in ("1", "true", "on", "yes")}
 
 
 @app.get("/api/info")

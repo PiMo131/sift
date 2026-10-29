@@ -6,6 +6,9 @@ fastapi>=0.110
 uvicorn[standard]>=0.29
 python-multipart>=0.0.9
 python-docx>=1.1
+# telefoon-toegang: QR-code en LAN-IP-detectie
+qrcode[pil]>=7.4
+psutil>=5.9
 # sprekerscheiding zonder token (embeddings + clustering)
 speechbrain>=1.0
 scipy>=1.11

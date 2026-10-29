@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sift.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#2563eb</Color>
+            <Color x:Key="AccentText">#ffffff</Color>
+            <Color x:Key="Ok">#16a34a</Color>
+            <Color x:Key="Bad">#dc2626</Color>
+
+            <Style TargetType="Page" ApplyToDerivedTypes="True">
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#f3f4f6, Dark=#111418}" />
+            </Style>
+            <Style TargetType="Shell" ApplyToDerivedTypes="True">
+                <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light=#ffffff, Dark=#1f2328}" />
+                <Setter Property="Shell.ForegroundColor" Value="{AppThemeBinding Light=#111418, Dark=#e5e7eb}" />
+                <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light=#111418, Dark=#e5e7eb}" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light=#ffffff, Dark=#1f2328}" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource Accent}" />
+                <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource Accent}" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light=#6b7280, Dark=#9ca3af}" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#111418, Dark=#e5e7eb}" />
+                <Setter Property="FontSize" Value="15" />
+            </Style>
+            <Style TargetType="Label" x:Key="Title">
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Label" x:Key="Muted">
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#6b7280, Dark=#9ca3af}" />
+                <Setter Property="FontSize" Value="13" />
+            </Style>
+            <Style TargetType="Label" x:Key="Error">
+                <Setter Property="TextColor" Value="{StaticResource Bad}" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+            <Style TargetType="Border" x:Key="Card">
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#ffffff, Dark=#1f2328}" />
+                <Setter Property="Stroke" Value="{AppThemeBinding Light=#e5e7eb, Dark=#374151}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+                <Setter Property="TextColor" Value="{StaticResource AccentText}" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="16,12" />
+                <Setter Property="MinimumHeightRequest" Value="48" />
+            </Style>
+            <Style TargetType="Button" x:Key="Secondary">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#111418, Dark=#e5e7eb}" />
+                <Setter Property="BorderColor" Value="{AppThemeBinding Light=#d1d5db, Dark=#4b5563}" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="FontAttributes" Value="None" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="16,12" />
+                <Setter Property="MinimumHeightRequest" Value="48" />
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=#111418, Dark=#e5e7eb}" />
+                <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light=#9ca3af, Dark=#6b7280}" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+            <Style TargetType="ProgressBar">
+                <Setter Property="ProgressColor" Value="{StaticResource Accent}" />
+            </Style>
+            <Style TargetType="ActivityIndicator">
+                <Setter Property="Color" Value="{StaticResource Accent}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

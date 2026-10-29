@@ -1,0 +1,26 @@
+Sift - offline-installatie (Windows)
+====================================
+
+Deze map bevat:
+  Sift-Setup-<versie>.exe   de installer (dezelfde als de lichte installer)
+  wheels\                   alle Python-onderdelen, vooraf gedownload (CPU- of GPU-variant: zie wheels\VARIANT)
+  LEESMIJ.txt               dit bestand
+
+Installeren zonder internet
+---------------------------
+1. Pak het hele archief uit. Is het gesplitst (.zip.001, .zip.002, ...)? Open dan .zip.001 met 7-Zip
+   (https://7-zip.org), dat leest de delen vanzelf achter elkaar. Zonder 7-Zip voeg je ze eerst samen:
+       copy /b Sift-Offline-GPU-<versie>.zip.001 + Sift-Offline-GPU-<versie>.zip.002 Sift-Offline-GPU-<versie>.zip
+   en pak je het resultaat uit met Verkenner.
+2. Laat Sift-Setup-<versie>.exe en de map wheels\ naast elkaar staan en start de installer.
+   De installer kopieert wheels\ mee naar de programmamap. De eerste start van Sift installeert alles
+   uit die map, zonder internet.
+3. Alleen de Whisper-modellen (large-v3: 3 GB, large-v3-turbo: 1,6 GB) worden bij de eerste transcriptie
+   van Hugging Face gedownload. Op een computer zonder internet: kopieer de map
+       %USERPROFILE%\.cache\huggingface\hub
+   van een computer waar Sift die modellen al heeft gebruikt.
+
+De GPU-variant vereist een NVIDIA-kaart met een recent stuurprogramma (CUDA zelf hoeft niet geinstalleerd
+te worden). De CPU-variant werkt overal, maar is ongeveer vijf keer trager.
+
+Volledige uitleg: docs/INSTALL.md in de broncode (https://github.com/PiMo131/sift).

@@ -9,7 +9,7 @@ from pathlib import Path
 
 APP_NAME = "sift"
 ROOT = Path(__file__).resolve().parent.parent
-PROJECTS_DIR = Path(os.environ.get("sift_PROJECTS", ROOT / "projects"))
+PROJECTS_DIR = Path(os.environ.get("SIFT_PROJECTS") or os.environ.get("STEMSPOOR_PROJECTS") or (ROOT / "projects"))
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 MODELS = {
@@ -41,7 +41,7 @@ DEFAULT_SETTINGS = {
 
 
 def find_ffmpeg() -> str | None:
-    env = os.environ.get("sift_FFMPEG")
+    env = os.environ.get("SIFT_FFMPEG")
     if env and Path(env).exists():
         return env
     p = shutil.which("ffmpeg")

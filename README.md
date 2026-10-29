@@ -23,7 +23,14 @@ Het is ontstaan voor een concreet probleem: een geïnterviewde die zacht en met 
 | Export MAXQDA / NVivo / Dresing & Pehl | ✔ | aTrain | ✔ |
 | Prijs | gratis | gratis | ~€10 per uur |
 
-## Snel starten (Windows)
+## Installeren zonder Python (Windows) en de Android-app
+
+- **Windows-installer**: `Sift-Setup-<versie>.exe` op de [Releases-pagina](https://github.com/PiMo131/sift/releases). Bij de eerste start installeert hij zelf de juiste onderdelen (GPU of CPU) en download Whisper bij de eerste transcriptie. Ook als offline-bundel. Uitleg, SmartScreen en schijfruimte: [docs/INSTALL.md](docs/INSTALL.md).
+- **Android-app**: `Sift-<versie>.apk` op dezelfde pagina. Scan de QR-code uit Sift, stuur opnames (ook WhatsApp-audio) naar je pc en kijk na op je telefoon: [docs/ANDROID.md](docs/ANDROID.md).
+
+Beide worden automatisch gebouwd door GitHub Actions bij een versietag (`v0.1.0`). De installer is niet digitaal ondertekend; Windows vraagt daarom eenmalig om "Toch uitvoeren".
+
+## Snel starten vanuit broncode (Windows)
 
 Vereist: Python 3.10 of nieuwer en [ffmpeg](https://ffmpeg.org) (`winget install Gyan.FFmpeg`). Voor GPU-versnelling een NVIDIA-kaart met recente driver; CUDA zelf hoeft niet geïnstalleerd te worden.
 
@@ -48,6 +55,17 @@ Bij de eerste verwerking worden de Whisper-modellen gedownload (large-v3 is 3 GB
 ![Pipeline](docs/screenshot_pipeline.png)
 
 ![Modellen vergelijken](docs/screenshot_compare.png)
+
+## Vanaf je telefoon
+
+Een interview opnemen of versturen met je telefoon, zonder kabel of cloud:
+
+1. Klik in Sift op **Telefoon** (rechtsboven) en zet **Bereikbaar op het netwerk** aan, of start Sift met `.\start.ps1 --lan`.
+2. Scan de QR-code met de camera van je telefoon (zelfde wifi, geen gastennetwerk). De 4-cijferige code wordt meegestuurd; typ hem anders over.
+3. Op de telefoon: **Tik om een opname te kiezen**, of neem direct op met **Opname starten**. Vink *direct transcriberen* aan als de pipeline meteen mag starten.
+4. De opname verschijnt op de computer als project; via **Open in Sift** kun je de voortgang en het transcript ook op je telefoon bekijken en nakijken (werkbalk met *Volgend onzeker* / *Volgend meningsverschil*).
+
+Verzoeken van andere apparaten worden alleen toegelaten met de code (5 foute pogingen = een minuut wachten); **Nieuwe code** maakt een andere. Windows Firewall vraagt bij de eerste verbinding mogelijk om toestemming: kies *Toegang toestaan* voor privénetwerken. Opnemen in de browser werkt alleen via https of localhost; via het wifi-adres blokkeren Android en iOS de microfoon, kies dan een opname uit de recorder-app (of gebruik de Sift-app voor Android). De pagina `http://<ip>:8765/drop` is als PWA aan het startscherm toe te voegen.
 
 ## Editor: sneltoetsen
 
