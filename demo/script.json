@@ -1,0 +1,26 @@
+{
+  "title": "Demo-interview: dagelijks leven met reuma (fictief)",
+  "note": "Volledig fictief. Alle namen, plaatsen en situaties zijn verzonnen. Gegenereerd met synthetische stemmen (edge-tts, nl-NL-MaartenNeural = Interviewer, nl-NL-FennaNeural = Respondent).",
+  "speakers": {"I": {"name": "Interviewer", "voice": "nl-NL-MaartenNeural"}, "R": {"name": "Respondent", "voice": "nl-NL-FennaNeural"}},
+  "lines": [
+    {"spk": "I", "text": "Goedemiddag mevrouw De Vries, fijn dat u mee wilt doen aan dit onderzoek. Kunt u om te beginnen iets vertellen over hoe een gewone dag er voor u uitziet?"},
+    {"spk": "R", "text": "Ja, natuurlijk. Eh, een gewone dag begint bij mij eigenlijk altijd langzaam. Ik word wakker en dan voel ik meteen of het een goede of een slechte dag wordt."},
+    {"spk": "I", "text": "Waar merkt u dat aan?"},
+    {"spk": "R", "text": "Vooral aan mijn handen. Als mijn vingers stijf zijn, dan weet ik dat ik extra tijd nodig heb. Dan duurt alleen het aankleden al een half uur."},
+    {"spk": "I", "text": "En hoe gaat u daar dan mee om?"},
+    {"spk": "R", "text": "Ik heb geleerd om, eh, te plannen. Mijn man Pieter helpt met de knoopjes en ik doe de rest zelf. Dat klinkt klein, maar het is best belangrijk voor mij dat ik het zelf blijf doen.", "gap_after": 4.0, "comment": "Hierna een bewuste stilte van 4 seconden (echte pauze, geen ontbrekende tekst)."},
+    {"spk": "I", "text": "U bent even stil. Is dit een lastig onderwerp?"},
+    {"spk": "R", "text": "Een beetje wel. Ik vind het soms moeilijk om hulp te vragen. Vroeger deed ik alles zelf, ook in de tuin.", "gain_db": -16, "comment": "ZACHTE PASSAGE: opzettelijk 16 dB zachter opgenomen."},
+    {"spk": "I", "text": "Kunt u iets vertellen over uw contact met de zorg?"},
+    {"spk": "R", "text": "Ik kom elke drie maanden bij dokter Pieters in het ziekenhuis in Zwolle. Hij neemt de tijd, dat waardeer ik. En de reumaverpleegkundige belt tussendoor."},
+    {"spk": "R", "text": "Het medicijn methotrexaat werkt goed, maar ik ben er wel vaak misselijk van.", "gain_db": -30, "rate": "+45%", "comment": "WEGGELATEN ZIN: opzettelijk heel zacht en snel, zodat een model deze zin waarschijnlijk overslaat. De spraakdetectie ziet hier wel spraak."},
+    {"spk": "I", "text": "Zijn er dingen die u door de reuma niet meer kunt doen?"},
+    {"spk": "R", "text": "Fietsen naar mijn dochter in Kampen lukt niet meer. Dat is twaalf kilometer. Nu neem ik de bus, of ze komt naar mij. Ik mis het wel, dat gevoel van vrijheid."},
+    {"spk": "I", "text": "Hoe reageert uw omgeving daarop?"},
+    {"spk": "R", "text": "Wisselend. Mijn buurvrouw Anneke zegt altijd: je ziet er toch goed uit. Dat is lief bedoeld, maar het voelt alsof de pijn niet telt omdat je het niet ziet."},
+    {"spk": "I", "text": "Wat zou u andere mensen met reuma willen meegeven?"},
+    {"spk": "R", "text": "Dat je, eh, mild moet zijn voor jezelf. Sommige dagen lukt alles, andere dagen niks. Dat is niet jouw schuld. En praat erover, ook als het ongemakkelijk is."},
+    {"spk": "I", "text": "Dank u wel, mevrouw De Vries. Dat was het laatste deel van het interview. Heeft u zelf nog iets toe te voegen?"},
+    {"spk": "R", "text": "Nee, ik denk dat ik alles gezegd heb. Bedankt voor het luisteren."}
+  ]
+}

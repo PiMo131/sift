@@ -1,0 +1,192 @@
+[
+ {
+  "i": 0,
+  "speaker": "Interviewer",
+  "start": 0.8,
+  "end": 9.85,
+  "text": "Goedemiddag mevrouw De Vries, fijn dat u mee wilt doen aan dit onderzoek. Kunt u om te beginnen iets vertellen over hoe een gewone dag er voor u uitziet?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 1,
+  "speaker": "Respondent",
+  "start": 10.55,
+  "end": 21.71,
+  "text": "Ja, natuurlijk. Eh, een gewone dag begint bij mij eigenlijk altijd langzaam. Ik word wakker en dan voel ik meteen of het een goede of een slechte dag wordt.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 2,
+  "speaker": "Interviewer",
+  "start": 22.41,
+  "end": 24.83,
+  "text": "Waar merkt u dat aan?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 3,
+  "speaker": "Respondent",
+  "start": 25.53,
+  "end": 36.28,
+  "text": "Vooral aan mijn handen. Als mijn vingers stijf zijn, dan weet ik dat ik extra tijd nodig heb. Dan duurt alleen het aankleden al een half uur.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 4,
+  "speaker": "Interviewer",
+  "start": 36.98,
+  "end": 39.5,
+  "text": "En hoe gaat u daar dan mee om?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 5,
+  "speaker": "Respondent",
+  "start": 40.2,
+  "end": 52.8,
+  "text": "Ik heb geleerd om, eh, te plannen. Mijn man Pieter helpt met de knoopjes en ik doe de rest zelf. Dat klinkt klein, maar het is best belangrijk voor mij dat ik het zelf blijf doen.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": "Hierna een bewuste stilte van 4 seconden (echte pauze, geen ontbrekende tekst)."
+ },
+ {
+  "i": 6,
+  "speaker": "Interviewer",
+  "start": 56.8,
+  "end": 61.63,
+  "text": "U bent even stil. Is dit een lastig onderwerp?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 7,
+  "speaker": "Respondent",
+  "start": 62.33,
+  "end": 71.21,
+  "text": "Een beetje wel. Ik vind het soms moeilijk om hulp te vragen. Vroeger deed ik alles zelf, ook in de tuin.",
+  "gain_db": -16,
+  "rate": "+0%",
+  "comment": "ZACHTE PASSAGE: opzettelijk 16 dB zachter opgenomen."
+ },
+ {
+  "i": 8,
+  "speaker": "Interviewer",
+  "start": 71.91,
+  "end": 75.36,
+  "text": "Kunt u iets vertellen over uw contact met de zorg?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 9,
+  "speaker": "Respondent",
+  "start": 76.06,
+  "end": 87.27,
+  "text": "Ik kom elke drie maanden bij dokter Pieters in het ziekenhuis in Zwolle. Hij neemt de tijd, dat waardeer ik. En de reumaverpleegkundige belt tussendoor.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 10,
+  "speaker": "Respondent",
+  "start": 87.97,
+  "end": 91.67,
+  "text": "Het medicijn methotrexaat werkt goed, maar ik ben er wel vaak misselijk van.",
+  "gain_db": -30,
+  "rate": "+45%",
+  "comment": "WEGGELATEN ZIN: opzettelijk heel zacht en snel, zodat een model deze zin waarschijnlijk overslaat. De spraakdetectie ziet hier wel spraak."
+ },
+ {
+  "i": 11,
+  "speaker": "Interviewer",
+  "start": 92.37,
+  "end": 95.99,
+  "text": "Zijn er dingen die u door de reuma niet meer kunt doen?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 12,
+  "speaker": "Respondent",
+  "start": 96.69,
+  "end": 109.41,
+  "text": "Fietsen naar mijn dochter in Kampen lukt niet meer. Dat is twaalf kilometer. Nu neem ik de bus, of ze komt naar mij. Ik mis het wel, dat gevoel van vrijheid.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 13,
+  "speaker": "Interviewer",
+  "start": 110.11,
+  "end": 113.14,
+  "text": "Hoe reageert uw omgeving daarop?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 14,
+  "speaker": "Respondent",
+  "start": 113.84,
+  "end": 125.38,
+  "text": "Wisselend. Mijn buurvrouw Anneke zegt altijd: je ziet er toch goed uit. Dat is lief bedoeld, maar het voelt alsof de pijn niet telt omdat je het niet ziet.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 15,
+  "speaker": "Interviewer",
+  "start": 126.08,
+  "end": 129.82,
+  "text": "Wat zou u andere mensen met reuma willen meegeven?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 16,
+  "speaker": "Respondent",
+  "start": 130.52,
+  "end": 144.04,
+  "text": "Dat je, eh, mild moet zijn voor jezelf. Sommige dagen lukt alles, andere dagen niks. Dat is niet jouw schuld. En praat erover, ook als het ongemakkelijk is.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 17,
+  "speaker": "Interviewer",
+  "start": 144.74,
+  "end": 153.59,
+  "text": "Dank u wel, mevrouw De Vries. Dat was het laatste deel van het interview. Heeft u zelf nog iets toe te voegen?",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ },
+ {
+  "i": 18,
+  "speaker": "Respondent",
+  "start": 154.29,
+  "end": 159.96,
+  "text": "Nee, ik denk dat ik alles gezegd heb. Bedankt voor het luisteren.",
+  "gain_db": 0,
+  "rate": "+0%",
+  "comment": ""
+ }
+]

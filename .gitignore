@@ -25,3 +25,8 @@ benchmark/*.txt
 # scratch
 *.tmp
 transcript_rescue_*.json
+
+# testomgeving van deze branch (fictieve projecten)
+projects_test/
+# de fictieve demo-opname mag wél mee (gegenereerd met demo/generate_demo.py)
+!demo/demo_interview.m4a
