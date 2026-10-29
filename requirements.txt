@@ -1,0 +1,12 @@
+faster-whisper>=1.2
+ctranslate2>=4.5
+soundfile>=0.12
+numpy>=1.26
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+python-docx>=1.1
+# GPU (NVIDIA): cuBLAS en cuDNN via pip, geen aparte CUDA-installatie nodig
+nvidia-cublas-cu12; sys_platform == "win32" or sys_platform == "linux"
+nvidia-cudnn-cu12; sys_platform == "win32" or sys_platform == "linux"
+# Optioneel, voor sprekerscheiding: pip install pyannote.audio torch  (+ Hugging Face-token in hf_token.txt)

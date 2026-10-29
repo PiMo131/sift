@@ -1,0 +1,28 @@
+[project]
+name = "sift"
+version = "0.1.0"
+description = "Lokale interviewtranscriptie met zekerheidsheatmap, multi-model consensus en correctie-editor"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "faster-whisper>=1.2", "ctranslate2>=4.5", "soundfile>=0.12", "numpy>=1.26",
+  "fastapi>=0.110", "uvicorn[standard]>=0.29", "python-multipart>=0.0.9", "python-docx>=1.1",
+]
+
+[project.optional-dependencies]
+gpu = ["nvidia-cublas-cu12", "nvidia-cudnn-cu12"]
+diarize = ["pyannote.audio>=3.1", "torch"]
+
+[project.scripts]
+sift = "sift.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["sift*"]
+
+[tool.setuptools.package-data]
+sift = ["static/*"]

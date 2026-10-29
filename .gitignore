@@ -1,0 +1,28 @@
+# omgeving
+.venv/
+__pycache__/
+*.pyc
+.claude/
+
+# projectdata en opnames: NOOIT meesturen (privacy van geïnterviewden)
+projects/
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.aac
+*.ogg
+*.flac
+hf_token.txt
+
+# benchmark: alleen scripts en verslag, geen transcripten van echte interviews
+benchmark/*.json
+benchmark/*.txt
+!benchmark/BENCHMARK.md
+
+# ontwerp-mockups staan in docs/mockups
+/mockups/
+
+# scratch
+*.tmp
+transcript_rescue_*.json

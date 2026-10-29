@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Sift</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/logo.svg">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="top">
+  <div class="logo"><img src="/static/logo.svg" alt=""><span>Sift</span></div>
+  <div class="file" id="topFile"></div>
+  <div class="tabs">
+    <button class="tab" data-view="home">Projecten</button>
+    <button class="tab" data-view="pipeline" disabled>Pipeline</button>
+    <button class="tab" data-view="editor" disabled>Transcript</button>
+    <button class="tab" data-view="compare" disabled>Modellen vergelijken</button>
+    <button class="tab" data-view="export" disabled>Export</button>
+  </div>
+  <div class="spacer"></div>
+  <div id="topActions"></div>
+</div>
+
+<!-- ---------- projecten ---------- -->
+<div class="view" id="view-home">
+  <div class="home">
+    <div class="grid2">
+      <div>
+        <h2>Projecten</h2>
+        <div class="sub">Elke opname is een project: audio, modeluitkomsten en jouw correcties bij elkaar.</div>
+        <div class="plist" id="plist"></div>
+      </div>
+      <div>
+        <h2>Nieuw project</h2>
+        <div class="sub">Sleep een opname hierheen (mp3, m4a, wav, mp4, WhatsApp-audio …).</div>
+        <div class="form">
+          <div class="drop" id="drop">Sleep een bestand hierheen of <label style="color:var(--accent);cursor:pointer;text-decoration:underline">kies een bestand<input type="file" id="fileInput" accept="audio/*,video/*" style="display:none"></label><div id="fileName" style="margin-top:6px;color:var(--text)"></div></div>
+          <label>Naam</label><input type="text" id="newName" placeholder="bijv. interview R03">
+          <label>Modellen</label>
+          <div class="opt" id="newModels"></div>
+          <label>Alleen een fragment transcriberen (seconden, leeg = alles)</label>
+          <div style="display:flex;gap:8px"><input type="number" id="newStart" placeholder="start" min="0"><input type="number" id="newEnd" placeholder="einde" min="0"></div>
+          <div style="margin-top:14px"><button class="btn primary" id="btnCreate">Project aanmaken en starten</button></div>
+          <div class="hw" id="hw"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- pipeline ---------- -->
+<div class="view hidden" id="view-pipeline"><div class="pipe" id="pipe"></div></div>
+
+<!-- ---------- editor ---------- -->
+<div class="view hidden" id="view-editor">
+  <div class="ed">
+    <div class="side" id="side"></div>
+    <div class="editor heat" id="editor"></div>
+    <div class="right" id="right"></div>
+  </div>
+  <div class="bottom">
+    <div class="wave" id="wave"><canvas id="waveCanvas"></canvas></div>
+    <div class="ctl">
+      <button class="btn small" id="btnBack" title="Ctrl+←">⏪</button>
+      <button class="play" id="btnPlay">▶</button>
+      <button class="btn small" id="btnFwd" title="Ctrl+→">⏩</button>
+      <span class="time" id="tCur">00:00,0</span><span id="tDur">/ 00:00</span>
+      <span class="save" id="saveState"></span>
+      <div class="set">
+        <span>Fragment</span><input type="number" class="k" id="preRoll" value="3" min="0" step="0.5" title="seconden vóór het woord"><input type="number" class="k" id="postRoll" value="3" min="0" step="0.5" title="seconden na het woord">
+        <label class="k"><input type="checkbox" id="loopChk"> loop</label>
+        <span>Terugspoelen bij hervatten</span><input type="number" class="k" id="rewind" value="2" min="0" step="0.5">
+        <label class="k"><input type="checkbox" id="autoPause" checked> pauze bij typen</label>
+        <span>Snelheid</span><select class="k" id="speed"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select>
+        <span>Gain</span><select class="k" id="gain"><option value="1">0 dB</option><option value="2">+6 dB</option><option value="4">+12 dB</option><option value="8">+18 dB</option></select>
+        <label class="k"><input type="checkbox" id="origAudio"> origineel</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- vergelijken ---------- -->
+<div class="view hidden" id="view-compare"><div class="cmp" id="cmp"></div></div>
+
+<!-- ---------- export ---------- -->
+<div class="view hidden" id="view-export"><div class="exp" id="exp"></div></div>
+
+<audio id="audio" preload="auto"></audio>
+<script src="/static/app.js"></script>
+</body>
+</html>
