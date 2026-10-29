@@ -81,13 +81,3 @@ def hardware_info() -> dict:
         except Exception:
             info["gpu_name"] = "CUDA-GPU"
     return info
-
-
-def hf_token() -> str | None:
-    tok = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
-    if tok:
-        return tok
-    f = ROOT / "hf_token.txt"
-    if f.exists():
-        return f.read_text(encoding="utf-8").strip() or None
-    return None

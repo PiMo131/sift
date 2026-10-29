@@ -13,7 +13,6 @@ projects/
 *.aac
 *.ogg
 *.flac
-hf_token.txt
 
 # benchmark: alleen scripts en verslag, geen transcripten van echte interviews
 benchmark/*.json

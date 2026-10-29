@@ -8,11 +8,12 @@ license = { text = "MIT" }
 dependencies = [
   "faster-whisper>=1.2", "ctranslate2>=4.5", "soundfile>=0.12", "numpy>=1.26",
   "fastapi>=0.110", "uvicorn[standard]>=0.29", "python-multipart>=0.0.9", "python-docx>=1.1",
+  "speechbrain>=1.0", "scipy>=1.11", "torch>=2.2", "torchaudio>=2.2",
 ]
 
 [project.optional-dependencies]
 gpu = ["nvidia-cublas-cu12", "nvidia-cudnn-cu12"]
-diarize = ["pyannote.audio>=3.1", "torch"]
+qwen = ["qwen-asr"]
 
 [project.scripts]
 sift = "sift.__main__:main"

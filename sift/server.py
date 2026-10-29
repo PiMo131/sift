@@ -10,7 +10,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, export, pipeline
+from . import __version__, diarize, export, pipeline
 from .config import DEFAULT_SETTINGS, MODELS, PROJECTS_DIR, STATIC_DIR, hardware_info
 from .project import Project
 
@@ -33,7 +33,7 @@ def index():
 @app.get("/api/info")
 def info():
     return {"version": __version__, "hardware": hardware_info(), "models": MODELS, "defaults": DEFAULT_SETTINGS,
-            "projects_dir": str(PROJECTS_DIR), "diarize_available": __import__("sift.diarize", fromlist=["available"]).available()}
+            "projects_dir": str(PROJECTS_DIR), "diarize_available": diarize.available(), "diarize_method": diarize.method()}
 
 
 # ---------- projecten ----------

@@ -134,13 +134,25 @@ class Job:
         if turns_path.exists():
             return
         if not diarize.available():
-            p.log("diarisatie overgeslagen: pyannote niet beschikbaar of geen HF-token (hf_token.txt)")
+            p.log("diarisatie overgeslagen: installeer speechbrain en torch (pip install -r requirements.txt)")
             return
-        self.set(step="Sprekers scheiden", progress=0.86, detail="pyannote")
+        runs = p.load_runs()
+        base = next((m for m in st["models"] if m in runs), None)
+        if not base:
+            return
+        self.set(step="Sprekers scheiden", progress=0.86, detail=diarize.method() or "")
         device, _ = resolve_device(st["device"])
-        turns = diarize.run(p.work / "audio_norm.wav", st.get("num_speakers") or None, device, p.log)
+        turns = diarize.run(p.work / "audio_norm.wav", runs[base]["segments"], st.get("num_speakers") or None, device,
+                            lambda t: self.set(detail=t))
+        if turns is None:
+            p.log("diarisatie mislukt")
+            return
         turns_path.write_text(json.dumps(turns), encoding="utf-8")
-        p.log(f"diarisatie: {len(turns or [])} beurten")
+        meta = p.meta()
+        used = "embeddings"
+        meta["diarization"] = {"method": used, "turns": len(turns), "speakers": len({t["speaker"] for t in turns})}
+        p.save_meta(meta)
+        p.log(f"diarisatie ({used}): {meta['diarization']['speakers']} sprekers, {len(turns)} beurten")
 
     # ---------- combineren ----------
     def _combine_step(self, p: Project, meta: dict, st: dict):
@@ -164,9 +176,19 @@ class Job:
         meta["summary"] = consensus.runs_summary(runs, st["uncertain_threshold"])
         p.save_meta(meta)
         if old and old.get("edited"):
-            # gebruiker heeft al bewerkt: nieuwe combinatie apart bewaren, transcript niet overschrijven
+            # gebruiker heeft al bewerkt: tekst bewaren, alleen sprekers opnieuw toewijzen als er diarisatie is
             (p.path / "transcript_recombined.json").write_text(json.dumps({**combined, "speakers": speakers}, ensure_ascii=False), encoding="utf-8")
-            p.log("transcript was al bewerkt; nieuwe combinatie opgeslagen als transcript_recombined.json")
+            if turns:
+                p.snapshot("voor_diarisatie")
+                old_speakers = diarize.assign(old["segments"], turns)
+                for sid, sp in (old.get("speakers") or {}).items():
+                    if sid in old_speakers and not sp["name"].startswith("Spreker "):
+                        old_speakers[sid] = sp
+                old["speakers"] = old_speakers
+                p.save_transcript(old)
+                p.log("sprekers toegewezen aan bewerkt transcript (tekst ongewijzigd); nieuwe combinatie apart in transcript_recombined.json")
+            else:
+                p.log("transcript was al bewerkt; nieuwe combinatie opgeslagen als transcript_recombined.json")
         else:
             p.save_transcript({**combined, "speakers": speakers, "edited": False}, keep_version=False)
 

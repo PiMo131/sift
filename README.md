@@ -86,13 +86,20 @@ De kleur is de kans die Whisper zelf aan het woord toekent (`word.probability`).
 
 ## Sprekerscheiding
 
-Diarisatie gebruikt [pyannote.audio](https://github.com/pyannote/pyannote-audio). Dat vereist eenmalig een gratis Hugging Face-token en het accepteren van de modelvoorwaarden:
+Volledig open source, zonder registratie of token. Per segment wordt een spreker-embedding berekend met SpeechBrain ECAPA-TDNN (Apache 2.0) en die embeddings worden geclusterd. Geef in de pipeline het aantal sprekers op; voor een interview met twee personen werkt dit goed. Bewust niet gebruikt: pyannote, omdat dat een Hugging Face-account en het accepteren van voorwaarden vereist.
 
-```powershell
-.\.venv\Scripts\pip install pyannote.audio torch
-```
+In de editor corrigeer je sprekers met een klik op de naam, met `Ctrl+S`, of via "deze én alle volgende" in het sprekermenu. Als je sprekerscheiding pas later aanzet, blijft je bewerkte tekst staan: alleen de sprekerlabels worden toegevoegd.
 
-Zet het token in `hf_token.txt` in de projectmap. Zonder diarisatie krijgt alles "Spreker 1" en wijs je sprekers in de editor toe (klik op de sprekernaam, of `Ctrl+S`). Een tweegesprek is zo in een paar minuten gelabeld.
+## Licenties van de onderdelen
+
+| Onderdeel | Licentie |
+|---|---|
+| Sift | MIT |
+| Whisper-modellen (OpenAI) via faster-whisper / CTranslate2 | MIT |
+| SpeechBrain ECAPA spreker-embeddings | Apache 2.0 |
+| Qwen3-ASR (optioneel) | Apache 2.0 |
+| FastAPI, uvicorn, python-docx, soundfile, numpy, scipy | MIT / BSD |
+| ffmpeg (extern programma) | LGPL/GPL |
 
 ## Projectstructuur
 
