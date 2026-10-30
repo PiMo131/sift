@@ -92,7 +92,12 @@ foreach ($cand in @(@("py", "-3.12"), @("py", "-3"), @("python"), @("python3")))
     $v = & $exe @extra -c "import sys; print(sys.version_info >= (3, 9))" 2>$null
     if ($v -eq "True") { $HostPython = ($cand -join " "); $HostPyExe = $exe; $HostPyArgs = $extra; break }
 }
-function Invoke-HostPython { & $HostPyExe @HostPyArgs @args; return $LASTEXITCODE }
+function Invoke-HostPython {
+    # Uitvoer naar het scherm (niet naar de pipeline), anders komt pip's tekst in de retourwaarde terecht
+    # en faalt de exitcode-controle van de aanroeper altijd.
+    & $HostPyExe @HostPyArgs @args 2>&1 | ForEach-Object { Write-Host "    $_" }
+    return $LASTEXITCODE
+}
 
 Say "Sift $Version   variant(en): $($variants -join ', ')$(if ($DryRun) { '   [DRY RUN]' })"
 Write-Host "    repo:      $Repo"
