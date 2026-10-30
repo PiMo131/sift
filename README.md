@@ -25,6 +25,8 @@ What Sift does:
 ## Installing without Python (Windows) and the Android app
 
 - **Windows installer**: `Sift-Setup-<version>.exe` on the [Releases page](https://github.com/PiMo131/sift/releases). On first start it installs the right components itself (GPU or CPU) and downloads Whisper on the first transcription. Also available as an offline bundle. Explanation, SmartScreen, requirements and disk space: [docs/INSTALL.md](docs/INSTALL.md) (Dutch).
+
+  Sift opens in its own window (Microsoft Edge WebView2, present on Windows 11 and with Edge on Windows 10; the installer fetches it if missing). Closing the window keeps Sift running in the system tray so a transcription continues; the tray icon offers *Sift tonen* (show), *Openen in browser*, the project and log folders and *Afsluiten* (quit), which stops the server. Starting Sift again brings the existing window to the front. `Sift.exe --browser` gives the old behaviour (default browser, no window).
 - **Android app**: `Sift-<version>.apk` on the same page. Scan the QR code from Sift, send recordings (including WhatsApp audio) to your PC and review on your phone: [docs/ANDROID.md](docs/ANDROID.md) (Dutch).
 
 Both are built automatically by GitHub Actions on a version tag (`v0.1.0`). The installer is not digitally signed, so Windows asks once for "Toch uitvoeren" (run anyway).
@@ -35,7 +37,7 @@ Without the installer you start Sift from source (Windows, Linux, macOS):
 
 1. Install [Python 3.10 or newer](https://www.python.org/downloads/) and [ffmpeg](https://ffmpeg.org) (Windows: `winget install Gyan.FFmpeg`).
 2. Download this repository (green *Code → Download ZIP* button, or `git clone https://github.com/PiMo131/sift.git`) and unpack it.
-3. Double-click `start.ps1` (Windows) or run `./start.sh` (Linux/macOS). The first time, the components are installed; that takes a few minutes.
+3. Double-click `start.ps1` (Windows) or run `./start.sh` (Linux/macOS). The first time, the components are installed; that takes a few minutes. On Windows, `start-app.ps1` starts the same thing in Sift's own window (needs the .NET 8 SDK).
 4. Your browser opens `http://127.0.0.1:8765`.
 
 On the first processing run Sift downloads a speech model once (1.6 to 3.1 GB; you see the progress). After that

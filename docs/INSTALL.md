@@ -5,7 +5,7 @@ Sift draait volledig op je eigen computer. Er zijn twee manieren om het op Windo
 
 | | Lichte installer | Offline-bundel |
 |---|---|---|
-| Bestand | `Sift-Setup-<versie>.exe` (ca. 70 MB) | `Sift-Offline-CPU-<versie>.zip` (ca. 1 GB) of `Sift-Offline-GPU-<versie>.zip.001` + `.002` (ca. 3,5 GB) |
+| Bestand | `Sift-Setup-<versie>.exe` (ca. 120 MB) | `Sift-Offline-CPU-<versie>.zip` (ca. 1 GB) of `Sift-Offline-GPU-<versie>.zip.001` + `.002` (ca. 3,5 GB) |
 | Internet nodig bij installeren | ja: de eerste start downloadt de Python-onderdelen (ca. 1 GB zonder, 3,5 GB met NVIDIA-GPU) | nee, alles zit erin |
 | Internet nodig bij de eerste transcriptie | ja, voor de Whisper-modellen (large-v3: 3 GB) | ja, tenzij je de modellen kopieert (zie onder) |
 | Kiest zelf CPU of GPU | ja, automatisch | nee: CPU- of GPU-bundel |
@@ -50,7 +50,7 @@ projectmap is instelbaar via de omgevingsvariabele `SIFT_PROJECTS`; ffmpeg vindt
 4. Bij de eerste start opent Sift een zwart console-venster: de **bootstrap**. Die installeert de resterende
    Python-onderdelen (torch, faster-whisper, speechbrain, ...) in de programmamap. Het venster toont de voortgang;
    met een NVIDIA-GPU wordt ongeveer 3,5 GB gedownload, zonder GPU ongeveer 1 GB. Dit gebeurt één keer, en opnieuw na
-   een update van Sift. Daarna sluit het venster en opent Sift in je browser op `http://127.0.0.1:8765`.
+   een update van Sift. Daarna sluit het venster en opent Sift in zijn eigen venster (zie [Het Sift-venster](#het-sift-venster)).
 5. Bij de eerste transcriptie worden de gekozen Whisper-modellen van Hugging Face gedownload (large-v3 is 3 GB,
    large-v3-turbo 1,6 GB). Ze komen in `%USERPROFILE%\.cache\huggingface\hub` en worden daarna hergebruikt.
 
@@ -62,6 +62,31 @@ projectmap is instelbaar via de omgevingsvariabele `SIFT_PROJECTS`; ffmpeg vindt
 - Elke stap wordt bij een fout één keer herhaald. Het volledige logboek staat in `%LOCALAPPDATA%\Sift\bootstrap.log`.
 - Afdwingen kan: `Sift.exe --cpu` of `Sift.exe --gpu` (bijvoorbeeld een laptop met NVIDIA-kaart die je toch op de
   CPU wilt laten werken). Combineer met `--repair` om een bestaande installatie om te zetten.
+
+### Het Sift-venster
+
+Sift is een gewoon bureaubladprogramma: `Sift.exe` start de server op de achtergrond, toont ondertussen een
+opstartscherm ("Sift wordt gestart…" met de fase: onderdelen installeren, server starten, modellen laden) en laat
+daarna de interface zien in een eigen venster met de titel *Sift*. Grootte, positie en gemaximaliseerd-stand worden
+onthouden (`%LOCALAPPDATA%\Sift\window.json`); minimaal 1100×700.
+
+- **Systeemvak.** Het venster sluiten stopt Sift niet: het verdwijnt naar het systeemvak (rechtsonder, bij de klok),
+  zodat een lopende transcriptie doorgaat. Dubbelklik op het icoon toont het venster weer; rechtsklik geeft *Sift
+  tonen*, *Openen in browser*, *Projectenmap openen*, *Logboek openen*, de keuze *Afsluiten bij sluiten venster*
+  (dan stopt Sift wél bij het sluiten) en *Afsluiten*. *Afsluiten* stopt de server met alle subprocessen.
+- **Eén Sift tegelijk.** Start je Sift nog een keer terwijl het al draait, dan komt het bestaande venster naar voren;
+  er wordt geen tweede server gestart. Draait de server al (bijvoorbeeld gestart met `start.ps1`), dan sluit het
+  venster daarop aan en laat hem bij afsluiten met rust.
+- **Toetsen.** F5 herlaadt, F11 schakelt volledig scherm, Ctrl + / Ctrl − / Ctrl 0 zoomen (wordt onthouden).
+- **Links en downloads.** Links naar externe websites (GitHub, Hugging Face) openen in je standaardbrowser. Exports
+  (Word, csv, zip) komen via het downloadvenster van het Sift-venster standaard in `Documenten\Sift\exports`.
+- **WebView2.** Het venster gebruikt de Microsoft Edge WebView2 Runtime, die standaard op Windows 11 staat en op
+  Windows 10 met Edge meekomt. Ontbreekt hij, dan downloadt de installer de officiële installer van Microsoft
+  (2 MB) en draait die stil; lukt dat niet (geen internet), dan biedt `Sift.exe` het bij de start opnieuw aan, met
+  als alternatief *In de browser openen*.
+- **Zonder venster.** `Sift.exe --browser` werkt zoals vroeger: server starten en de standaardbrowser openen op
+  `http://127.0.0.1:8765`; er staat dan alleen een icoon in het systeemvak om af te sluiten.
+- **Telefoon.** Niets verandert: de server luistert ook op het netwerk (met code, zie *Telefoon* in de app).
 
 ## Offline-bundel
 
@@ -89,17 +114,21 @@ computers.
 | | |
 |---|---|
 | Programma | `%LOCALAPPDATA%\Programs\Sift` (Sift.exe, `app\sift`, `python\`, `ffmpeg\`) |
-| Projecten (opnames, transcripten, exports) | `Documenten\Sift\projects` |
+| Projecten (opnames, transcripten) | `Documenten\Sift\projects` |
+| Gedownloade exports | `Documenten\Sift\exports` |
 | Whisper- en SpeechBrain-modellen | `%USERPROFILE%\.cache\huggingface\hub` |
-| Logboeken | `%LOCALAPPDATA%\Sift\bootstrap.log` (installatie) en `sift.log` (server) |
+| Logboeken en vensterinstellingen | `%LOCALAPPDATA%\Sift\bootstrap.log` (installatie), `sift.log` (launcher en server), `window.json`, `webview2\` (browserprofiel van het venster) |
 
 Sift luistert op poort 8765, ook op je lokale netwerk (voor de telefoon-koppeling; verzoeken van buiten deze computer
 worden pas toegelaten na het inschakelen van *LAN* in de app, met een code). Windows vraagt daarom bij de eerste start
 mogelijk om toegang door de firewall; kies *Particuliere netwerken*. De installer maakt zelf geen firewallregel aan
 (dat vereist beheerdersrechten).
 
-Ontwikkelaars: `Sift.exe --port 9000 --no-browser` werkt zoals `python -m sift`. Draait Sift al op de poort, dan
-opent Sift.exe alleen de browser.
+Ontwikkelaars: `Sift.exe --port 9000` start op een andere poort; `--projects <map>` kiest de projectenmap,
+`--devtools` zet het contextmenu en de ontwikkelhulpmiddelen van WebView2 aan, `--browser` opent de browser in
+plaats van het venster en `--no-wait` (impliceert `--browser`) start alleen de server en keert meteen terug, voor
+scripts. Vanuit de broncode: `start-app.ps1` bouwt de launcher en start hem in dev-modus (met `.venv`, zonder
+bootstrap).
 
 ## Herstellen en verwijderen
 
@@ -132,12 +161,17 @@ Wat `build.ps1` doet:
 
 1. Downloadt (met sha256-controle, gecachet in `installer\.build\dl`) de Python 3.12 embeddable (python.org), de
    ffmpeg "essentials"-build van gyan.dev en een pip-wheel.
-2. Bouwt de launcher `Sift.exe` (`installer\launcher`, C#/.NET 8, self-contained, één bestand) met het icoon
-   `installer\sift.ico` (gemaakt uit `sift/static/logo.svg` door `installer\make_icon.py`).
+2. Bouwt de launcher `Sift.exe` (`installer\launcher`, C#/.NET 8 WinForms met WebView2, self-contained, één
+   bestand, niet getrimd omdat WinForms dat niet verdraagt; `WebView2Loader.dll` zit in de exe via
+   `IncludeNativeLibrariesForSelfExtract`) met het icoon `installer\sift.ico` (gemaakt uit `sift/static/logo.svg`
+   door `installer\make_icon.py`).
 3. Zet de stage-map klaar: `Sift.exe`, `app\` (sift-pakket, `requirements.txt`, `bootstrap.py`, `VERSION`),
    `python\` (met aangepaste `python312._pth` zodat `import site`, pip en `..\app` werken), `ffmpeg\` (ffmpeg,
    ffprobe, LICENSE) en `tools\pip-*.whl`.
-4. Compileert `installer\Sift.iss` met ISCC.
+4. Compileert `installer\Sift.iss` met ISCC. Het script controleert in `[Code]` of de WebView2 Runtime aanwezig is
+   (registerwaarde `pv` van `EdgeUpdate\Clients\{F3017226-...}`) en downloadt zo niet de bootstrapper van Microsoft
+   tijdens de installatie (Inno's downloadpagina, naar `{tmp}`), die daarna stil draait. De bootstrapper wordt bewust
+   niet meegeleverd: geen herdistributievoorwaarden en altijd de actuele versie.
 5. Voor een offline-bundel: `pip download` van alle wheels voor cp312/win_amd64 (torch van download.pytorch.org,
    CPU of cu126) naar `wheels\`, plus de setup-exe en `LEESMIJ.txt`, gezipt met 7-Zip en boven 1,9 GB gesplitst in
    `.zip.001/.002`.
@@ -147,7 +181,7 @@ Testen zonder iets te raken: installeer stil in een tijdelijke map en start op e
 ```powershell
 .\installer\dist\Sift-Setup-0.1.0.exe /VERYSILENT /SUPPRESSMSGBOXES /DIR="$env:TEMP\SiftTest"
 & "$env:TEMP\SiftTest\python\python.exe" "$env:TEMP\SiftTest\app\bootstrap.py" --cpu
-& "$env:TEMP\SiftTest\Sift.exe" --port 8799 --no-browser --no-wait
+& "$env:TEMP\SiftTest\Sift.exe" --port 8799 --no-wait --no-browser   # alleen de server, zonder venster
 Invoke-RestMethod http://127.0.0.1:8799/api/info | Select-Object version
 & "$env:TEMP\SiftTest\unins000.exe" /VERYSILENT
 ```
@@ -160,4 +194,5 @@ ps2exe-bestanden worden vaak door virusscanners aangezien voor malware.
 ## Zonder installer: starten vanuit de broncode
 
 Zie de README onder "Starten vanuit de broncode" en "Voor ontwikkelaars": `git clone`, `.\start.ps1` (maakt een
-virtuele omgeving en installeert alles). Vereist Python 3.10 of nieuwer en ffmpeg.
+virtuele omgeving en installeert alles). Vereist Python 3.10 of nieuwer en ffmpeg. Wil je ook vanuit de broncode het
+eigen venster: `.\start-app.ps1` (vereist de .NET 8 SDK; bouwt de launcher en start hem met de `.venv`).

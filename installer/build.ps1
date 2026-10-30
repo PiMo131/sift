@@ -5,7 +5,7 @@
 .DESCRIPTION
   Zelfde stappen als .github/workflows/release.yml, zodat je lokaal kunt testen zonder CI.
 
-    light         Sift-Setup-<versie>.exe        (Python embed + ffmpeg + sift + launcher + bootstrap)
+    light         Sift-Setup-<versie>.exe        (Python embed + ffmpeg + sift + launcher (WinForms/WebView2) + bootstrap)
     offline-cpu   Sift-Offline-CPU-<versie>.zip  (setup-exe + wheels\ met alle cp312/win_amd64-wheels, torch cpu)
     offline-gpu   Sift-Offline-GPU-<versie>.zip.001/.002 (idem, torch cu126 + cuBLAS/cuDNN; gesplitst met 7-Zip)
     all           alle drie
@@ -188,6 +188,10 @@ if ($needSetup) {
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish mislukt" }
     $LauncherExe = Join-Path $LauncherOut "Sift.exe"
     if (-not (Test-Path $LauncherExe)) { throw "Sift.exe niet gevonden na publish" }
+    # WebView2Loader.dll (native, uit het NuGet-pakket) zit door IncludeNativeLibrariesForSelfExtract in de exe en wordt
+    # bij de start uitgepakt. Staat er toch een losse dll naast de exe (andere SDK-instelling), dan gaat die mee.
+    $LauncherExtra = @(Get-ChildItem $LauncherOut -File | Where-Object { $_.Name -ne "Sift.exe" -and $_.Extension -in ".dll", ".json" })
+    if ($LauncherExtra) { Write-Host "    let op: losse bestanden naast Sift.exe gaan mee: $($LauncherExtra.Name -join ', ')" -ForegroundColor Yellow }
 
     # ------------------------------------------------------------ stage
     Say "stage opbouwen in $Stage"
@@ -195,6 +199,7 @@ if ($needSetup) {
     New-Item -ItemType Directory -Force "$Stage\app", "$Stage\python", "$Stage\ffmpeg", "$Stage\tools" | Out-Null
 
     Copy-Item $LauncherExe "$Stage\Sift.exe"
+    foreach ($f in $LauncherExtra) { Copy-Item $f.FullName "$Stage\$($f.Name)" }
 
     # sift-pakket zonder caches
     robocopy (Join-Path $Repo "sift") "$Stage\app\sift" /E /XD __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null

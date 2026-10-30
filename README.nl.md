@@ -22,6 +22,8 @@ Wat Sift doet:
 ## Installeren zonder Python (Windows) en de Android-app
 
 - **Windows-installer**: `Sift-Setup-<versie>.exe` op de [Releases-pagina](https://github.com/PiMo131/sift/releases). Bij de eerste start installeert hij zelf de juiste onderdelen (GPU of CPU) en downloadt Whisper bij de eerste transcriptie. Ook als offline-bundel. Uitleg, SmartScreen, vereisten en schijfruimte: [docs/INSTALL.md](docs/INSTALL.md).
+
+  Sift opent in een eigen venster (Microsoft Edge WebView2, standaard aanwezig op Windows 11 en met Edge op Windows 10; de installer haalt het op als het ontbreekt). Het venster sluiten laat Sift doordraaien in het systeemvak, zodat een transcriptie doorgaat; het icoon daar biedt *Sift tonen*, *Openen in browser*, de projecten- en logboekmap en *Afsluiten*, dat de server stopt. Sift nogmaals starten haalt het bestaande venster naar voren. `Sift.exe --browser` geeft het oude gedrag (standaardbrowser, geen venster).
 - **Android-app**: `Sift-<versie>.apk` op dezelfde pagina. Scan de QR-code uit Sift, stuur opnames (ook WhatsApp-audio) naar je pc en kijk na op je telefoon: [docs/ANDROID.md](docs/ANDROID.md).
 
 Beide worden automatisch gebouwd door GitHub Actions bij een versietag (`v0.1.0`). De installer is niet digitaal ondertekend; Windows vraagt daarom eenmalig om "Toch uitvoeren".
@@ -32,7 +34,7 @@ Zonder installer start je Sift vanuit de broncode (Windows, Linux, macOS):
 
 1. Installeer [Python 3.10 of nieuwer](https://www.python.org/downloads/) en [ffmpeg](https://ffmpeg.org) (Windows: `winget install Gyan.FFmpeg`).
 2. Download deze repository (groene knop *Code → Download ZIP*, of `git clone https://github.com/PiMo131/sift.git`) en pak uit.
-3. Dubbelklik op `start.ps1` (Windows) of voer `./start.sh` uit (Linux/macOS). De eerste keer worden de onderdelen geïnstalleerd; dat duurt enkele minuten.
+3. Dubbelklik op `start.ps1` (Windows) of voer `./start.sh` uit (Linux/macOS). De eerste keer worden de onderdelen geïnstalleerd; dat duurt enkele minuten. Op Windows start `start-app.ps1` hetzelfde in het eigen venster van Sift (vereist de .NET 8 SDK).
 4. Je browser opent `http://127.0.0.1:8765`.
 
 Bij de eerste verwerking downloadt Sift eenmalig een spraakmodel (1,6 tot 3,1 GB; je ziet de voortgang). Daarna werkt

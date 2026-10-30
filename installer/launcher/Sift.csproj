@@ -1,24 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Sift-launcher: klein zelfstandig .NET 8-programma (geen console-venster) dat de eerste keer
-       bootstrap.py in een console draait en daarna de server start. Build: dotnet publish -c Release. -->
+  <!-- Sift-launcher: zelfstandig .NET 8-bureaubladprogramma (WinForms + WebView2). Draait de eerste keer bootstrap.py,
+       start daarna de Python-server en toont de interface in een eigen venster met systeemvakicoon.
+       Build: dotnet publish -c Release (self-contained, één bestand; zie installer/build.ps1).
+       Ontwikkelen vanuit de broncode: start-app.ps1 in de hoofdmap van de repo (dotnet build + dev-modus). -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Sift</AssemblyName>
     <RootNamespace>Sift</RootNamespace>
     <ApplicationIcon>../sift.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
+    <!-- WinForms is niet trim-veilig; daarom geen PublishTrimmed meer (exe is daardoor groter, maar werkt gegarandeerd). -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <!-- WebView2Loader.dll (native, uit het NuGet-pakket) wordt zo in de exe gebundeld en bij de start uitgepakt. -->
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <InvariantGlobalization>true</InvariantGlobalization>
     <UseSystemResourceKeys>true</UseSystemResourceKeys>
     <DebugType>none</DebugType>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- het WebView2-pakket levert ook de WPF-assembly mee (ongebruikt); dat geeft een onschuldige WindowsBase-versiewaarschuwing -->
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
     <SiftVersion Condition="'$(SiftVersion)' == ''">0.0.0</SiftVersion>
     <Version>$(SiftVersion)</Version>
     <FileVersion>$(SiftVersion)</FileVersion>
@@ -27,4 +36,13 @@
     <Company>Sift</Company>
     <Copyright>MIT</Copyright>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- het icoon ook als resource, voor het opstartscherm (128 px) -->
+    <EmbeddedResource Include="../sift.ico" LogicalName="Sift.sift.ico" />
+  </ItemGroup>
 </Project>
