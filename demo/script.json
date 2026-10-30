@@ -13,7 +13,7 @@
     {"spk": "R", "text": "Een beetje wel. Ik vind het soms moeilijk om hulp te vragen. Vroeger deed ik alles zelf, ook in de tuin.", "gain_db": -16, "comment": "ZACHTE PASSAGE: opzettelijk 16 dB zachter opgenomen."},
     {"spk": "I", "text": "Kunt u iets vertellen over uw contact met de zorg?"},
     {"spk": "R", "text": "Ik kom elke drie maanden bij dokter Pieters in het ziekenhuis in Zwolle. Hij neemt de tijd, dat waardeer ik. En de reumaverpleegkundige belt tussendoor."},
-    {"spk": "R", "text": "Het medicijn methotrexaat werkt goed, maar ik ben er wel vaak misselijk van.", "gain_db": -30, "rate": "+45%", "comment": "WEGGELATEN ZIN: opzettelijk heel zacht en snel, zodat een model deze zin waarschijnlijk overslaat. De spraakdetectie ziet hier wel spraak."},
+    {"spk": "R", "text": "Het medicijn methotrexaat werkt goed, maar ik ben er wel vaak misselijk van.", "gain_db": -44, "rate": "+75%", "comment": "WEGGELATEN ZIN: opzettelijk heel zacht (-44 dB) en snel (+75%), zodat beide Whisper-modellen deze zin overslaan terwijl de spraakdetectie (Silero VAD) hier wel spraak ziet. Gekozen na proeven met tien varianten (zie docs/VERIFICATIE.md)."},
     {"spk": "I", "text": "Zijn er dingen die u door de reuma niet meer kunt doen?"},
     {"spk": "R", "text": "Fietsen naar mijn dochter in Kampen lukt niet meer. Dat is twaalf kilometer. Nu neem ik de bus, of ze komt naar mij. Ik mis het wel, dat gevoel van vrijheid."},
     {"spk": "I", "text": "Hoe reageert uw omgeving daarop?"},
