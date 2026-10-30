@@ -5,6 +5,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Sift</RootNamespace>
     <UseMaui>true</UseMaui>
+    <!-- Versie van de MAUI-pakketten komt uit de workload; terugvalwaarde voor SDK's die MauiVersion niet zetten -->
+    <MauiVersion Condition="'$(MauiVersion)' == ''">8.0.100</MauiVersion>
+    <CheckEolWorkloads>false</CheckEolWorkloads>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
