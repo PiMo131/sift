@@ -8,85 +8,75 @@
 <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-<div class="top">
+<a class="skip" href="#main">Naar de inhoud</a>
+<header class="top">
   <div class="logo"><img src="/static/logo.svg" alt=""><span>Sift</span></div>
-  <div class="file" id="topFile"></div>
-  <div class="tabs">
-    <button class="tab" data-view="home">Projecten</button>
-    <button class="tab" data-view="pipeline" disabled>Pipeline</button>
+  <div class="file" id="topFile" aria-live="polite"></div>
+  <nav class="tabs" aria-label="Onderdelen">
+    <button class="tab" data-view="home">Start</button>
+    <button class="tab" data-view="process" disabled>Opname verwerken</button>
     <button class="tab" data-view="editor" disabled>Transcript</button>
     <button class="tab" data-view="compare" disabled>Modellen vergelijken</button>
-    <button class="tab" data-view="export" disabled>Export</button>
-  </div>
+    <button class="tab" data-view="export" disabled>Exporteren</button>
+  </nav>
   <div class="spacer"></div>
   <div id="topActions"></div>
-</div>
+</header>
 
-<!-- ---------- projecten ---------- -->
-<div class="view" id="view-home">
-  <div class="home">
-    <div class="grid2">
-      <div>
-        <h2>Projecten</h2>
-        <div class="sub">Elke opname is een project: audio, modeluitkomsten en jouw correcties bij elkaar.</div>
-        <div class="plist" id="plist"></div>
-      </div>
-      <div>
-        <h2>Nieuw project</h2>
-        <div class="sub">Sleep een opname hierheen (mp3, m4a, wav, mp4, WhatsApp-audio …).</div>
-        <div class="form">
-          <div class="drop" id="drop">Sleep een bestand hierheen of <label style="color:var(--accent);cursor:pointer;text-decoration:underline">kies een bestand<input type="file" id="fileInput" accept="audio/*,video/*" style="display:none"></label><div id="fileName" style="margin-top:6px;color:var(--text)"></div></div>
-          <label>Naam</label><input type="text" id="newName" placeholder="bijv. interview R03">
-          <label>Modellen</label>
-          <div class="opt" id="newModels"></div>
-          <label>Alleen een fragment transcriberen (seconden, leeg = alles)</label>
-          <div style="display:flex;gap:8px"><input type="number" id="newStart" placeholder="start" min="0"><input type="number" id="newEnd" placeholder="einde" min="0"></div>
-          <div style="margin-top:14px"><button class="btn primary" id="btnCreate">Project aanmaken en starten</button></div>
-          <div class="hw" id="hw"></div>
+<main id="main">
+<!-- ---------- start ---------- -->
+<section class="view" id="view-home" aria-label="Start"><div class="home" id="home"></div></section>
+
+<!-- ---------- opname verwerken ---------- -->
+<section class="view hidden" id="view-process" aria-label="Opname verwerken"><div class="pipe" id="pipe"></div></section>
+
+<!-- ---------- transcript / nakijken ---------- -->
+<section class="view hidden" id="view-editor" aria-label="Transcript nakijken">
+  <div class="ed" id="ed">
+    <aside class="side" id="side" aria-label="Overzicht"></aside>
+    <div class="editor" id="editor"></div>
+    <aside class="right" id="right" aria-label="Aandachtspunt"></aside>
+  </div>
+  <div class="bottom">
+    <div class="wave" id="wave" title="Klik om af te spelen, sleep om een stuk te herhalen"><canvas id="waveCanvas" aria-hidden="true"></canvas></div>
+    <div class="ctl">
+      <button class="btn small" id="btnBack" aria-label="3 seconden terug" title="3 s terug (Ctrl+←)">⏪</button>
+      <button class="play" id="btnPlay" aria-label="Afspelen of pauzeren" title="Afspelen / pauze (Ctrl+Spatie)">▶</button>
+      <button class="btn small" id="btnFwd" aria-label="3 seconden vooruit" title="3 s vooruit (Ctrl+→)">⏩</button>
+      <span class="time" id="tCur">00:00,0</span><span id="tDur">/ 00:00</span>
+      <label class="k inline" for="speed">Snelheid <select class="k" id="speed"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label>
+      <span class="save" id="saveState" role="status" aria-live="polite"></span>
+      <div class="set">
+        <button class="btn small" id="btnListen" aria-haspopup="dialog" aria-expanded="false" title="Luisteropties">⚙ Luisteropties</button>
+        <div class="pop hidden" id="listenPop" role="dialog" aria-label="Luisteropties">
+          <h5>Luisteropties</h5>
+          <div class="prow"><label for="preRoll">Fragment: seconden vóór het woord</label><input type="number" class="k" id="preRoll" value="3" min="0" step="0.5"></div>
+          <div class="prow"><label for="postRoll">Seconden na het woord</label><input type="number" class="k" id="postRoll" value="3" min="0" step="0.5"></div>
+          <div class="prow"><label for="loopChk">Fragment herhalen</label><input type="checkbox" id="loopChk"></div>
+          <div class="prow"><label for="rewind">Terugspoelen bij hervatten (s)</label><input type="number" class="k" id="rewind" value="2" min="0" step="0.5"></div>
+          <div class="prow"><label for="autoPause">Pauzeren terwijl je typt</label><input type="checkbox" id="autoPause" checked></div>
+          <div class="prow"><label for="clickPlay">Klik op een woord speelt meteen af</label><input type="checkbox" id="clickPlay" checked></div>
+          <div class="prow"><label for="gain">Versterking</label><select class="k" id="gain"><option value="1">0 dB</option><option value="2">+6 dB</option><option value="4">+12 dB</option><option value="8">+18 dB</option></select></div>
+          <div class="prow"><label for="origAudio">Oorspronkelijke audio (niet genormaliseerd)</label><input type="checkbox" id="origAudio"></div>
+          <div class="sub" style="margin:6px 0 0">Zonder "klik speelt af" selecteer je tekst zoals in een tekstverwerker; afspelen doe je dan met de tijdcode of Ctrl+Spatie.</div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- ---------- pipeline ---------- -->
-<div class="view hidden" id="view-pipeline"><div class="pipe" id="pipe"></div></div>
-
-<!-- ---------- editor ---------- -->
-<div class="view hidden" id="view-editor">
-  <div class="ed">
-    <div class="side" id="side"></div>
-    <div class="editor heat" id="editor"></div>
-    <div class="right" id="right"></div>
-  </div>
-  <div class="bottom">
-    <div class="wave" id="wave"><canvas id="waveCanvas"></canvas></div>
-    <div class="ctl">
-      <button class="btn small" id="btnBack" title="Ctrl+←">⏪</button>
-      <button class="play" id="btnPlay">▶</button>
-      <button class="btn small" id="btnFwd" title="Ctrl+→">⏩</button>
-      <span class="time" id="tCur">00:00,0</span><span id="tDur">/ 00:00</span>
-      <span class="save" id="saveState"></span>
-      <div class="set">
-        <span>Fragment</span><input type="number" class="k" id="preRoll" value="3" min="0" step="0.5" title="seconden vóór het woord"><input type="number" class="k" id="postRoll" value="3" min="0" step="0.5" title="seconden na het woord">
-        <label class="k"><input type="checkbox" id="loopChk"> loop</label>
-        <span>Terugspoelen bij hervatten</span><input type="number" class="k" id="rewind" value="2" min="0" step="0.5">
-        <label class="k"><input type="checkbox" id="autoPause" checked> pauze bij typen</label>
-        <span>Snelheid</span><select class="k" id="speed"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select>
-        <span>Gain</span><select class="k" id="gain"><option value="1">0 dB</option><option value="2">+6 dB</option><option value="4">+12 dB</option><option value="8">+18 dB</option></select>
-        <label class="k"><input type="checkbox" id="origAudio"> origineel</label>
-      </div>
-    </div>
-  </div>
-</div>
+</section>
 
 <!-- ---------- vergelijken ---------- -->
-<div class="view hidden" id="view-compare"><div class="cmp" id="cmp"></div></div>
+<section class="view hidden" id="view-compare" aria-label="Modellen vergelijken"><div class="cmp" id="cmp"></div></section>
 
-<!-- ---------- export ---------- -->
-<div class="view hidden" id="view-export"><div class="exp" id="exp"></div></div>
+<!-- ---------- exporteren ---------- -->
+<section class="view hidden" id="view-export" aria-label="Exporteren"><div class="exp" id="exp"></div></section>
+</main>
 
 <audio id="audio" preload="auto"></audio>
 <script src="/static/app.js"></script>
+<script src="/static/process.js"></script>
+<script src="/static/editor.js"></script>
+<script src="/static/export.js"></script>
+<script src="/static/main.js"></script>
 </body>
 </html>
