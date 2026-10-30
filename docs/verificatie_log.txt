@@ -1,0 +1,16 @@
+Minimale verificatie met demo/demo_interview.m4a (fictief), echte transcriptie, 2026-10-30 01:38
+
+OK  1 Open Sift als nieuwe gebruiker — lege projectmap, startpagina met 'Nieuw interview'
+OK  2 Onderzoek aangemaakt met woordenlijst en afspraken — stopwoorden: weglaten bij export (clean verbatim)
+OK  3 Taal, sprekers en vaktermen opgegeven zonder modelkeuze — Geavanceerd bleef dicht; modellen volgens aanbeveling voor deze computer
+OK  4a Fragment van 1 minuut verwerkt (echte transcriptie) — modellen ['large-v3', 'large-v3-turbo'], duur 60 s, 39 s na start
+OK  4b Daarna de hele opname verwerkt — 38 segmenten, 1 interval(len) mogelijk ontbrekende tekst [(89.01, 90.64)], uitleg tijdcodes fragment getoond: True
+OK  5 Tekst gecorrigeerd, aandachtspunt 'Klopt zo', passage op 'Later luisteren' — modelscore ongewijzigd na bevestigen
+OK  6 Citaat gemarkeerd en spreker gecorrigeerd — sprekers hernoemd naar Interviewer / Anna de Vries (fictief)
+OK  7 Opslaan met focus in de tekst, vertraagde respons en een fout — status toonde achtereenvolgens: wijzigingen aanwezig → bezig → opgeslagen; mislukt → opnieuw → opgeslagen; niets verloren
+OK  8 Versie bewaard, tekst gewijzigd, versie hersteld — automatische versie 'voor herstel' aanwezig
+OK  9 Fictieve naam vervangen; Word- en gegevensexport gecontroleerd — bestanden demo_interview.docx en demo_interview.segmenten.csv; origineel ongewijzigd; vervangingen ook in sprekerlabel, titel en bestandsnaam
+OK  10 Alleen citaten geëxporteerd — citaatbestand bevat alleen segment 2 (1 regels)
+OK  11 Back-up gemaakt en hersteld in een lege omgeving — zip met 15 bestanden incl. opname, versies, runs en study.json; tekst, audio, labels, opmerkingen, instellingen en onderzoek terug
+OK  12 Toetsenbord, schermgrootte en zoom — Tab/Shift+Tab = focusnavigatie, Ctrl+S = opslaan, Alt+↓ = volgend aandachtspunt; 1366×768 100%: ok; 1920×1080 100%: ok; 1366×768 125%: ok; 1366×768 150%: ok; 1920×1080 125%: ok; 1920×1080 150%: ok
+OK  Geen JavaScript-fouten tijdens de doorloop

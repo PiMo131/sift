@@ -2,113 +2,249 @@
 
 # Sift
 
-**Lokale interviewtranscriptie die laat zien waar je moet luisteren.**
+**Van interviewopname naar een gecontroleerd transcript, op je eigen computer, met hulp bij de passages die aandacht nodig hebben.**
 
-Sift transcribeert interviews volledig op je eigen computer (CPU of NVIDIA-GPU), legt meerdere spraakmodellen over elkaar en toont per woord hoe zeker het model is. In de editor klik je op een woord, hoort je het fragment eromheen, en corrigeer je direct. Gemaakt voor kwalitatief onderzoek, met exports naar Word, CSV, MAXQDA/NVivo en Dresing & Pehl-notatie.
+Sift is voor studenten en onderzoekers die interviews afnemen (gezondheidswetenschappen, medische wetenschappen, ander
+kwalitatief onderzoek) en een zorgvuldig nagekeken transcript nodig hebben volgens de afspraken van hun onderzoek.
+Je hoeft niets van Python, modellen of audiotechniek te weten. De opname verlaat je computer niet.
 
-Het is ontstaan voor een concreet probleem: een geïnterviewde die zacht en met weinig articulatie spreekt door een spierziekte. Clouddiensten als Amberscript leverden daar te veel fouten op en de audio mocht de deur niet uit. Sift normaliseert daarom eerst de audio, en maakt het nakijken zo snel mogelijk door precies te tonen waar de modellen twijfelen of het oneens zijn.
+Wat Sift doet:
 
-![Editor](docs/screenshot_editor.png)
+1. Je kiest een opname en zegt welke taal er gesproken wordt en met hoeveel mensen.
+2. Sift zet de opname om in tekst met tijdcodes, wijst sprekers toe en markeert wat aandacht nodig heeft.
+3. Je kijkt het transcript na met de audio ernaast: klik op een woord en je hoort het fragment; Sift leidt je langs de aandachtspunten.
+4. Je exporteert naar Word, MAXQDA, NVivo, een citatenlijst of een gegevensformaat, desgewenst met namen vervangen.
 
-## Wat Sift anders doet
-
-| | Sift | Whisper-GUI's (noScribe, Buzz, aTrain) | Amberscript / Sonix |
-|---|---|---|---|
-| Draait lokaal, geen upload | ✔ | ✔ | ✘ |
-| Audio normaliseren vóór herkenning | ✔ (loudnorm + compressor) | ✘ | ✘ |
-| Zekerheid per woord als heatmap | ✔ | ✘ | alleen Sonix |
-| Meerdere modellen combineren (consensus) | ✔ | ✘ | ✘ |
-| Spring naar volgend onzeker woord / meningsverschil | ✔ | ✘ | ✘ |
-| Klik op woord → fragment ±N s, loop, terugspoelen bij hervatten | ✔ | deels | deels |
-| Export MAXQDA / NVivo / Dresing & Pehl | ✔ | aTrain | ✔ |
-| Prijs | gratis | gratis | ~€10 per uur |
+![Transcript nakijken](docs/screenshot_editor.png)
 
 ## Installeren zonder Python (Windows) en de Android-app
 
-- **Windows-installer**: `Sift-Setup-<versie>.exe` op de [Releases-pagina](https://github.com/PiMo131/sift/releases). Bij de eerste start installeert hij zelf de juiste onderdelen (GPU of CPU) en download Whisper bij de eerste transcriptie. Ook als offline-bundel. Uitleg, SmartScreen en schijfruimte: [docs/INSTALL.md](docs/INSTALL.md).
+- **Windows-installer**: `Sift-Setup-<versie>.exe` op de [Releases-pagina](https://github.com/PiMo131/sift/releases). Bij de eerste start installeert hij zelf de juiste onderdelen (GPU of CPU) en downloadt Whisper bij de eerste transcriptie. Ook als offline-bundel. Uitleg, SmartScreen, vereisten en schijfruimte: [docs/INSTALL.md](docs/INSTALL.md).
 - **Android-app**: `Sift-<versie>.apk` op dezelfde pagina. Scan de QR-code uit Sift, stuur opnames (ook WhatsApp-audio) naar je pc en kijk na op je telefoon: [docs/ANDROID.md](docs/ANDROID.md).
 
 Beide worden automatisch gebouwd door GitHub Actions bij een versietag (`v0.1.0`). De installer is niet digitaal ondertekend; Windows vraagt daarom eenmalig om "Toch uitvoeren".
 
-## Snel starten vanuit broncode (Windows)
+## Starten vanuit de broncode
 
-Vereist: Python 3.10 of nieuwer en [ffmpeg](https://ffmpeg.org) (`winget install Gyan.FFmpeg`). Voor GPU-versnelling een NVIDIA-kaart met recente driver; CUDA zelf hoeft niet geïnstalleerd te worden.
+Zonder installer start je Sift vanuit de broncode (Windows, Linux, macOS):
 
-```powershell
-git clone https://github.com/PiMo131/sift.git
-cd sift
-.\start.ps1
-```
+1. Installeer [Python 3.10 of nieuwer](https://www.python.org/downloads/) en [ffmpeg](https://ffmpeg.org) (Windows: `winget install Gyan.FFmpeg`).
+2. Download deze repository (groene knop *Code → Download ZIP*, of `git clone https://github.com/PiMo131/sift.git`) en pak uit.
+3. Dubbelklik op `start.ps1` (Windows) of voer `./start.sh` uit (Linux/macOS). De eerste keer worden de onderdelen geïnstalleerd; dat duurt enkele minuten.
+4. Je browser opent `http://127.0.0.1:8765`.
 
-Het script maakt een virtuele omgeving, installeert alles en opent `http://127.0.0.1:8765` in je browser. Linux/macOS: `./start.sh`.
+Bij de eerste verwerking downloadt Sift eenmalig een spraakmodel (1,6 tot 3,1 GB; je ziet de voortgang). Daarna werkt
+alles zonder internet. Vereisten, schijfruimte en modeldownloads staan in [docs/INSTALL.md](docs/INSTALL.md).
 
-Bij de eerste verwerking worden de Whisper-modellen gedownload (large-v3 is 3 GB).
+## Probeer het met het fictieve demo-interview
 
-## Werkwijze
+In `demo/` staat een volledig verzonnen interview van 2,5 minuut over het dagelijks leven met reuma, ingesproken met
+synthetische stemmen (`demo/demo_interview.m4a`, script met tijdcodes in `demo/script.md`). Het bevat opzettelijk een
+zachte passage, een stilte van vier seconden en een zin die zo zacht en snel is dat de spraakmodellen die overslaan.
 
-1. **Project aanmaken.** Sleep een opname naar het startscherm (mp3, m4a, wav, mp4, WhatsApp-audio). Kies de modellen. Je kunt eerst een fragment van een paar minuten doen om instellingen te testen.
-2. **Pipeline.** Inlezen → luidheid normaliseren → (optioneel ruisfilter) → transcriberen per model → sprekers scheiden → combineren. Elke stap wordt gecached; een extra model later toevoegen kost geen herberekening.
-3. **Transcript.** Nakijken in de editor. `Tab` springt naar het volgende onzekere woord, `Shift+Tab` naar het volgende woord waar de modellen het oneens zijn. Klik op een woord om het fragment te horen, kies een alternatief in het rechterpaneel of typ gewoon over de tekst heen. Alles wordt automatisch opgeslagen.
-4. **Modellen vergelijken.** Alle modellen per segment onder elkaar, op tijd uitgelijnd, met een tijdlijn van het hele interview waar rood aangeeft waar ze het oneens zijn.
-5. **Export.** Word, tekst, CSV (per segment of per woord met zekerheid), SRT, JSON, en een MAXQDA/NVivo-formaat met tijdcode per alinea. Stijl verbatim of clean verbatim, tijdcodes als `[00:01:23]` of `#00:01:23-4#`, anonimisering met plaatshouders.
+1. Start Sift, klik op *+ Nieuw onderzoek* en geef het een naam.
+2. Kies onder *Nieuw interview* het bestand `demo/demo_interview.m4a`, taal Nederlands, 2 sprekers, en klik *Transcript maken*.
+3. Na een halve tot enkele minuten (afhankelijk van je computer) staat het transcript klaar. Gebruik *Volgend aandachtspunt* om de passages te bekijken die aandacht nodig hebben; bij ongeveer 1:29 staat *Mogelijk ontbrekende tekst — luister terug*: dat is de weggelaten zin uit het script.
 
-![Pipeline](docs/screenshot_pipeline.png)
+Alle resultaten in deze README en in `docs/` zijn gemaakt met dit demo-interview; de screenshots zijn met
+`docs/screenshots.py` gegenereerd. Er is geen echt interviewmateriaal gebruikt.
 
-![Modellen vergelijken](docs/screenshot_compare.png)
+## De volledige flow
+
+### 1. Onderzoek en interview aanmaken
+
+Een **onderzoek** bundelt interviews met een gedeelde woordenlijst (namen, afkortingen, vaktermen),
+transcriptieafspraken en exportvoorkeuren. Een **interview** is één opname met eigen transcript, sprekers,
+opmerkingen, aandachtspunten, versies en controlestatus. Bij elk interview zie je de status en de volgende nuttige stap.
+
+Voor een nieuw interview geef je op: de opname, een naam, de gesproken taal, het aantal sprekers (of *weet ik niet*:
+Sift schat het dan op stemkenmerken, controleer het daarna) en optioneel namen en vaktermen. Sift kiest zelf een
+passende configuratie voor jouw computer; specialistische instellingen staan onder *Geavanceerd*. Met *Probeer eerst
+twee minuten* verwerk je eerst een fragment; daarna kun je met één klik de hele opname doen.
+
+![Start](docs/screenshot_home.png)
+
+### 2. Opname verwerken
+
+De verwerking laat in gewone taal zien wat er gebeurt: opname voorbereiden, tekst herkennen (per model), sprekers
+toewijzen, transcript voorbereiden. Een modeldownload wordt apart getoond, met grootte en voortgang. Zodra er genoeg
+gegevens zijn, zie je een schatting van de resterende tijd met een marge. Bij een fout krijg je concrete vervolgstappen;
+de technische melding en het logboek staan onder *Technische details*. Onderbreken bewaart wat al klaar is; hervatten
+gaat verder waar het bleef.
+
+![Opname verwerken](docs/screenshot_process.png)
+
+### 3. Nakijken
+
+Het transcript staat als gewone, rustige tekst. Aandachtspunten zijn gemarkeerd met een teken (ook zonder kleur):
+`?` *aandacht nodig* (lage modelscore), `≠` *modellen geven verschillende woorden*, `⟲` *later opnieuw luisteren*,
+`⚠` *mogelijk ontbrekende tekst*. Met *Vorig / Volgend aandachtspunt* (Alt+↑/↓) loop je ze langs en kies je per punt:
+**Klopt zo**, **Aangepast** of **Later opnieuw luisteren**. Afgehandelde punten komen niet terug, tenzij je het woord
+later toch verandert. Filters bepalen welke soorten je ziet.
+
+*Interessant citaat* (Alt+C) en *Later opnieuw luisteren* (Alt+L) zijn aparte markeringen met eigen lijsten.
+Bestaande highlights uit oudere projecten zijn bij de migratie overgenomen als *Interessant citaat*.
+
+Klik op een woord om het fragment te horen (uit te zetten bij *Luisteropties*), typ gewoon over de tekst heen, kies
+een alternatief van een ander model, wissel de spreker, splits of voeg samen, en maak alles ongedaan met Ctrl+Z.
+Alles wordt automatisch opgeslagen; de status onderin zegt eerlijk *wijzigingen aanwezig*, *bezig met opslaan*,
+*opgeslagen* of *opslaan mislukt* (met een knop om het opnieuw te proberen). Ctrl+S slaat direct op.
+
+Aandachtspunten helpen prioriteren, maar vinden niet alle fouten. Een volledige luistercontrole blijft de norm; de
+voortgang (segmenten nagekeken, aandachtspunten afgehandeld) is gebaseerd op jouw controle, niet op modelzekerheid.
+*Gecontroleerd* is een status die alleen jij zet.
+
+| Toets | Werking |
+|---|---|
+| Ctrl+Spatie | Afspelen / pauze (springt bij hervatten iets terug) |
+| Ctrl+← / Ctrl+→ | 3 seconden terug / vooruit |
+| Alt+↓ / Alt+↑ (J / K buiten de tekst) | Volgend / vorig aandachtspunt |
+| Alt+K · Alt+L · Alt+C | Klopt zo · Later opnieuw luisteren · Interessant citaat |
+| Alt+S | Spreker wisselen |
+| Ctrl+Enter | Segment nagekeken, door naar het volgende |
+| Ctrl+S · Ctrl+Z · Ctrl+Y | Opslaan · ongedaan maken · opnieuw |
+| Ctrl+U · Ctrl+F | [onverstaanbaar hh:mm:ss] invoegen · zoek en vervang |
+| Enter · Backspace aan het begin | Splitsen · samenvoegen |
+| Tab / Shift+Tab | Gewone focusnavigatie langs knoppen en velden |
+
+### 4. Transcriptieafspraken
+
+Per onderzoek leg je vast hoe je omgaat met stopwoorden, herhalingen, afgebroken zinnen, pauzes, lachen,
+onverstaanbare passages en overlap, met per keuze een voor/na-voorbeeld. Sift is precies over wat automatisch
+gebeurt (alleen: geselecteerde stopwoorden weglaten bij een export in *clean verbatim*) en wat je zelf doet (de knoppen
+in de werkbalk voegen de gekozen notatie in). *Verbatim* betekent: zoals herkend en door jou gecorrigeerd; een model
+herkent niet elke aarzeling. Het tijdcodeformaat `#hh:mm:ss-t#` is alleen een notatie, geen volledige ondersteuning van
+het protocol van Dresing & Pehl. De afspraken zijn als tekst te exporteren om met je begeleider af te stemmen; Sift
+beoordeelt niet of ze methodologisch passend zijn.
+
+![Onderzoek instellen](docs/screenshot_study.png)
+
+### 5. Exporteren
+
+Je begint met het doel: **Naar Word**, **Naar MAXQDA**, **Naar NVivo**, **Citaten exporteren**, **Ondertitels** of
+**Geavanceerde gegevensformaten** (tekst, CSV per segment, CSV per woord, *Transcriptgegevens (JSON)*). Per formaat
+zie je alleen de instellingen die ervoor gelden, wat er in het bestand terechtkomt en een voorbeeld. Instellingen
+blijven bewaard bij wisselen.
+
+*Namen en herkenbare gegevens vervangen* is een tabel (te vervangen tekst → vervanging) die geldt voor transcripttekst,
+sprekernamen, opmerkingen, alternatieve woorden, titel en bestandsnaam; alle vervangingen gebeuren in één keer, met
+woordgrenzen en hoofdletterbehoud. Dit is pseudonimiseren, geen gegarandeerde anonimisering: plaatsen, organisaties
+en beschrijvingen kunnen iemand nog herkenbaar maken. Het transcript en de opname veranderen niet.
+
+Word krijgt regelnummering, een neutrale titel en optioneel een controleoverzicht (nagekeken, open aandachtspunten,
+afspraken). De MAXQDA- en NVivo-bestanden volgen de tekst-met-tijdstempels-opzet van aTrain; ze zijn **niet in MAXQDA
+of NVivo zelf getest** en worden zo ook in de interface aangeduid.
+
+![Exporteren](docs/screenshot_export.png)
+
+### 6. Versies en back-up
+
+*Versie bewaren* slaat de actuele tekst op, inclusief wat je nog aan het typen bent. Onder *Exporteren → Versies* zie
+je datum, naam en een voorbeeld, en kun je herstellen; vóór herstel wordt de huidige toestand automatisch bewaard.
+Een **volledige back-up** (zip) bevat de oorspronkelijke opname, transcript, sprekers, opmerkingen, versies,
+modeluitvoer, instellingen en het onderzoek. Dat is dus géén gepseudonimiseerde export. Terugzetten maakt altijd een
+nieuw interview aan en overschrijft nooit iets.
 
 ## Vanaf je telefoon
 
 Een interview opnemen of versturen met je telefoon, zonder kabel of cloud:
 
-1. Klik in Sift op **Telefoon** (rechtsboven) en zet **Bereikbaar op het netwerk** aan, of start Sift met `.\start.ps1 --lan`.
+1. Klik in Sift op **📱 Telefoon** (rechtsboven) en zet **Bereikbaar op het netwerk** aan, of start Sift met `.\start.ps1 --lan`. Dezelfde QR-code en code staan ook op de startpagina, onder *Nieuw interview*.
 2. Scan de QR-code met de camera van je telefoon (zelfde wifi, geen gastennetwerk). De 4-cijferige code wordt meegestuurd; typ hem anders over.
-3. Op de telefoon: **Tik om een opname te kiezen**, of neem direct op met **Opname starten**. Vink *direct transcriberen* aan als de pipeline meteen mag starten.
-4. De opname verschijnt op de computer als project; via **Open in Sift** kun je de voortgang en het transcript ook op je telefoon bekijken en nakijken (werkbalk met *Volgend onzeker* / *Volgend meningsverschil*).
+3. Op de telefoon: **Tik om een opname te kiezen**, of neem direct op met **Opname starten**. Vink *direct transcriberen* aan als de verwerking meteen mag starten.
+4. De opname verschijnt op de computer als interview (op de telefoon kun je het meteen aan een onderzoek koppelen; anders komt het onder *Zonder onderzoek*). Via **Open in Sift** kun je de voortgang en het transcript ook op je telefoon bekijken en nakijken (werkbalk met *Volgend aandachtspunt*; de panelen *Overzicht* en *Aandachtspunt* klap je in en uit met de knoppen in de werkbalk).
 
-Verzoeken van andere apparaten worden alleen toegelaten met de code (5 foute pogingen = een minuut wachten); **Nieuwe code** maakt een andere. Windows Firewall vraagt bij de eerste verbinding mogelijk om toestemming: kies *Toegang toestaan* voor privénetwerken. Opnemen in de browser werkt alleen via https of localhost; via het wifi-adres blokkeren Android en iOS de microfoon, kies dan een opname uit de recorder-app (of gebruik de Sift-app voor Android). De pagina `http://<ip>:8765/drop` is als PWA aan het startscherm toe te voegen.
+Verzoeken van andere apparaten worden alleen toegelaten met de code (5 foute pogingen = een minuut wachten); **Nieuwe code** maakt een andere. Windows Firewall vraagt bij de eerste verbinding mogelijk om toestemming: kies *Toegang toestaan* voor privénetwerken. Opnemen in de browser werkt alleen via https of localhost; via het wifi-adres blokkeren Android en iOS de microfoon, kies dan een opname uit de recorder-app (of gebruik de Sift-app voor Android, zie [docs/ANDROID.md](docs/ANDROID.md)). De pagina `http://<ip>:8765/drop` is als PWA aan het startscherm toe te voegen.
 
-## Editor: sneltoetsen
+## Wat lokaal blijft en waarvoor internet nodig is
 
-| Toets | Werking |
-|---|---|
-| `Ctrl+Space` | Play / pauze (springt bij hervatten een instelbaar aantal seconden terug) |
-| `Ctrl+←` / `Ctrl+→` | 3 seconden terug / vooruit |
-| `Tab` / `Shift+Tab` | Volgend onzeker woord / volgend meningsverschil tussen modellen |
-| `Ctrl+Enter` | Segment markeren als nagekeken en door naar het volgende |
-| `Ctrl+S` | Spreker van dit segment wisselen |
-| `Ctrl+H` | Highlight (citaat, of "later nog eens luisteren") |
-| `Ctrl+U` | `[onverstaanbaar hh:mm:ss]` invoegen |
-| `Ctrl+F` | Zoek en vervang (ook in sprekernamen) |
-| `Enter` / `Backspace` aan begin | Segment splitsen / samenvoegen |
-| Klik op woord | Fragment afspelen met instelbare voor- en naloop |
-| Slepen in golfvorm | Selectie loopen |
+- Opnames, transcripten, opmerkingen, exports en back-ups blijven op je computer (map `projects/`, instelbaar met `SIFT_PROJECTS`). Niets wordt geüpload; er is geen account en geen analytics.
+- Internet is alleen nodig voor het eenmalig downloaden van spraakmodellen van Hugging Face (en bij installatie vanuit broncode voor de Python-onderdelen). De interface laat downloads zien.
+- Zet de projectmap bij voorkeur niet in een gesynchroniseerde map (OneDrive): synchronisatie houdt bestanden soms kort vast. Sift probeert het schrijven dan opnieuw en meldt het eerlijk als het mislukt.
 
-Verder: auto-pauze bij typen (hervat 2 s na de laatste toets), snelheid 0,5 tot 1,5×, extra gain tot +18 dB, schakelen tussen genormaliseerde en originele audio.
+## Ondersteuning en bekende beperkingen
 
-## Modellen
+- Modelscores zijn hints, geen gemeten kans dat een woord klopt. Aandachtspunten vinden niet alle fouten; een volledige luistercontrole blijft nodig.
+- De controle *mogelijk ontbrekende tekst* gebruikt spraakdetectie en verschillen tussen modellen. Ze mist passages die álle modellen én de spraakdetectie overslaan, en kan afgaan op lachen, hoesten of achtergrondgeluid. Afwijzen kan met één klik.
+- Sprekerscheiding werkt goed bij twee duidelijk verschillende stemmen; bij meer sprekers of gelijkende stemmen zijn correcties nodig. *Weet ik niet* is een schatting.
+- Pseudonimisering vervangt alleen wat je in de tabel zet. Context kan iemand herkenbaar houden.
+- MAXQDA- en NVivo-import is niet in die programma's getest.
+- De Windows-installer is niet digitaal ondertekend (SmartScreen-melding bij de eerste start); starten vanuit broncode vereist Python en ffmpeg.
+- Getest op Windows 11 met een NVIDIA RTX 2000 Ada (8 GB) en op de processor; Linux/macOS alleen via `start.sh`, niet uitgebreid getest.
 
-| Model | Kwaliteit | GPU (RTX 2000 Ada) | CPU (i7-13700H, int8) | Opmerking |
-|---|---|---|---|---|
-| Whisper large-v3 | beste | 7× realtime | 1,5× realtime | aanbevolen basismodel |
-| Whisper large-v3-turbo | goed | 26× realtime | 2,5× realtime | snelle tweede stem |
-| Whisper medium | redelijk | 12× | 3× | voor zwakke hardware |
-| Qwen3-ASR 1.7B | wisselend | 5× | te traag | optioneel, `pip install qwen-asr torch`; geen woordzekerheid |
+Vragen of problemen: open een issue op GitHub met de tekst onder *Technische details* (zonder opname of transcript).
+Een overzicht van de uitgevoerde controles staat in [docs/VERIFICATIE.md](docs/VERIFICATIE.md), de stand per
+onderdeel in [docs/IMPLEMENTATIE.md](docs/IMPLEMENTATIE.md).
 
-Meerdere modellen worden per woord op tijd uitgelijnd. Strategieën: **consensus** (meerderheid wint, bij gelijkspel beslist de gebruiker), **hoogste zekerheid wint**, of **basismodel plus alternatieven**. Modellen draaien altijd na elkaar: twee modellen tegelijk op één GPU van 8 GB bleek tien tot dertig keer trager.
+---
 
-Wat werd getest en afviel: CrisperWhisper (verbatim-variant; de faster-whisper-conversie levert onbruikbare uitvoer en de licentie is niet-commercieel) en ruisonderdrukking vóór herkenning (geen meetbare winst). Het volledige benchmarkverslag staat in [benchmark/BENCHMARK.md](benchmark/BENCHMARK.md).
+## Voor ontwikkelaars
 
-## Zekerheid: wat betekent de kleur?
+### Installatie vanuit broncode en starten
 
-De kleur is de kans die Whisper zelf aan het woord toekent (`word.probability`). Het is een hint, geen foutdetector: een licht woord kan goed zijn en een donker woord fout. In de praktijk zit het grootste deel van de echte fouten in de woorden onder 0,6 en in de woorden waar modellen het oneens zijn, en dat is precies waar `Tab` en `Shift+Tab` je naartoe brengen. De drempel is instelbaar.
+```powershell
+git clone https://github.com/PiMo131/sift.git
+cd sift
+.\start.ps1                       # maakt .venv, installeert requirements.txt, start op http://127.0.0.1:8765
+.\.venv\Scripts\python -m sift --no-browser --port 8765
+```
 
-## Sprekerscheiding
+Linux/macOS: `./start.sh`. Omgevingsvariabelen: `SIFT_PROJECTS` (projectmap), `SIFT_FFMPEG` (pad naar ffmpeg).
+GPU: een NVIDIA-kaart met recente driver; cuBLAS/cuDNN komen via pip mee, CUDA hoeft niet apart geïnstalleerd.
 
-Volledig open source, zonder registratie of token. Per segment wordt een spreker-embedding berekend met SpeechBrain ECAPA-TDNN (Apache 2.0) en die embeddings worden geclusterd. Geef in de pipeline het aantal sprekers op; voor een interview met twee personen werkt dit goed. Bewust niet gebruikt: pyannote, omdat dat een Hugging Face-account en het accepteren van voorwaarden vereist.
+### Tests
 
-In de editor corrigeer je sprekers met een klik op de naam, met `Ctrl+S`, of via "deze én alle volgende" in het sprekermenu. Als je sprekerscheiding pas later aanzet, blijft je bewerkte tekst staan: alleen de sprekerlabels worden toegevoegd.
+```powershell
+.\.venv\Scripts\python -m pip install pytest playwright && .\.venv\Scripts\python -m playwright install chromium
+.\.venv\Scripts\python -m pytest tests            # backend (export, pseudonimisering, migratie, back-up, API) + browsertests
+.\.venv\Scripts\python tests\walkthrough_demo.py  # de twaalf verificatiestappen met echte transcriptie van het demo-interview
+.\.venv\Scripts\python demo\generate_demo.py      # demo-audio opnieuw genereren (edge-tts, internet nodig)
+```
 
-## Licenties van de onderdelen
+### Architectuur
+
+Backend: FastAPI (`sift/server.py`) met faster-whisper (CTranslate2) in subprocessen (`sift/engines/`), SpeechBrain
+ECAPA-embeddings met ward-clustering voor sprekers (`sift/diarize.py`), combineren van modeluitkomsten
+(`sift/consensus.py`), controle op ontbrekende tekst met Silero VAD (`sift/gaps.py`), exports met een contract per
+formaat (`sift/export.py`, `sift/pseudonym.py`), back-up (`sift/backup.py`), onderzoeken (`sift/studies.py`),
+transcriptieafspraken (`sift/conventions.py`), controlestatus (`sift/review.py`) en versiebeheerde migraties
+(`sift/migrate.py`). Frontend: vanilla JS zonder build-stap (`sift/static/app.js`, `process.js`, `editor.js`,
+`export.js`).
+
+```
+projects/<interview>/
+  project.json          instellingen, status, controlestatus, study_id      (schema_version 2)
+  transcript.json       het bewerkbare transcript: segmenten, woorden, markeringen, gaps (schema_version 2)
+  versions/             versies (+ .meta.json met naam en datum)
+  runs/<model>.json     ruwe uitvoer per model (start, end, word, p)
+  work/                 audio_16k.wav, audio_norm.wav, play.m4a, peaks.json, vad.json, diarization.json
+projects/_studies/<id>.json   onderzoek: naam, woordenlijst, afspraken, exportvoorkeuren
+```
+
+Oude projecten (zonder `schema_version`) worden bij het laden in het geheugen gemigreerd en pas bij de volgende opslag
+weggeschreven; `sift/migrate.py` bevat ook de omgekeerde stap. Het woordformaat per model is overal hetzelfde,
+waardoor een nieuwe engine een adapter van één bestand is.
+
+### Modellen en verwerking
+
+| Model | Kwaliteit | GPU (RTX 2000 Ada) | CPU (i7-13700H, int8) |
+|---|---|---|---|
+| Whisper large-v3 | beste | ± 7–11× realtime | ± 1,5× realtime |
+| Whisper large-v3-turbo | goed | ± 25–38× realtime | ± 2,5× realtime |
+| Whisper medium | redelijk | ± 12× | ± 3× |
+| Qwen3-ASR 1.7B (optioneel) | wisselend | ± 5× | te traag |
+
+Snelheden gemeten op 29–30 oktober 2026 met faster-whisper 1.2.1 op de genoemde hardware (zie
+`benchmark/BENCHMARK.md`). Audio wordt eerst genormaliseerd (highpass, compressor, loudnorm −16 LUFS); dat verlaagde
+in een beperkte proef het aantal onzekere woorden met een kwart. Meerdere modellen worden per woord op tijd uitgelijnd
+(met correctie voor verschoven woordtijden); strategieën: consensus, hoogste score, basismodel + alternatieven.
+Modellen draaien na elkaar: twee modellen tegelijk op één GPU van 8 GB bleek tien tot dertig keer trager.
+
+De benchmark in `benchmark/BENCHMARK.md` is een **beperkte proef zonder handmatig referentietranscript**: de cijfers
+zijn gemiddelde modelscores en aantallen onzekere woorden op één opname, geen gemeten woordfoutpercentages. Voor
+uitspraken over transcriptiekwaliteit is een onafhankelijk gecontroleerd referentietranscript nodig.
+
+### Licenties van de onderdelen
 
 | Onderdeel | Licentie |
 |---|---|
@@ -118,34 +254,13 @@ In de editor corrigeer je sprekers met een klik op de naam, met `Ctrl+S`, of via
 | Qwen3-ASR (optioneel) | Apache 2.0 |
 | FastAPI, uvicorn, python-docx, soundfile, numpy, scipy | MIT / BSD |
 | ffmpeg (extern programma) | LGPL/GPL |
+| edge-tts (alleen voor het genereren van de demo) | GPL-3.0; niet meegeleverd in Sift |
 
-## Projectstructuur
+### Dankwoord en bronnen
 
-```
-projects/<naam>/
-  project.json          instellingen, status, modelstatistieken
-  transcript.json       het bewerkbare transcript (autosave, met versies in versions/)
-  runs/<model>.json     ruwe uitvoer per model, met woordtijden en zekerheid
-  work/                 audio_16k.wav, audio_norm.wav, play.m4a, peaks.json
-  log.txt
-```
-
-Alles staat in gewone JSON; je kunt er met eigen scripts bij. Het woordformaat per model is overal hetzelfde (`start`, `end`, `word`, `p`), waardoor een nieuwe engine een adapter van één bestand is (`sift/engines/`).
-
-## Privacy
-
-Niets verlaat je computer. Modellen worden eenmalig van Hugging Face gedownload; daarna werkt Sift offline. De map `projects/` staat in `.gitignore`.
-
-## Ontwikkeling
-
-```powershell
-.\.venv\Scripts\python -m sift --no-browser --port 8765
-```
-
-Backend: FastAPI + faster-whisper (CTranslate2). Frontend: één HTML-pagina met vanilla JS, geen build-stap. Engines draaien in een subproces, zodat een vastgelopen GPU de app niet meeneemt, met automatische terugval op CPU.
-
-## Dankwoord en bronnen
-
-Ideeën overgenomen uit noScribe (sprekertoewijzing, pauzeweergave, subproces-architectuur), aTrain (MAXQDA-export, faster-whisper-instellingen), f4 (terugspoelen bij hervatten, tekstbouwstenen), Sonix (zekerheidsheatmap als schakelaar), MacWhisper (zoek en vervang, exportpresets) en Amberscript (anonimisering, Dresing & Pehl-richtlijnen).
+Ideeën overgenomen uit noScribe (sprekertoewijzing, pauzeweergave, subproces-architectuur), aTrain (MAXQDA-export,
+faster-whisper-instellingen), f4 (terugspoelen bij hervatten, tekstbouwstenen), Sonix (zekerheidsmarkering als
+schakelaar), MacWhisper (zoek en vervang, exportpresets) en Amberscript (pseudonimisering, Dresing & Pehl-notatie).
+Het ontwerponderzoek staat in `ONDERZOEK.md`.
 
 Licentie: MIT.

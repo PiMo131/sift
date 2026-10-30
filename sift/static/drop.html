@@ -50,14 +50,16 @@
 </head>
 <body>
 <h1><img src="/static/logo.svg" alt=""><span>Sift</span></h1>
-<p class="sub">Stuur een opname naar de computer; die verschijnt daar als project.</p>
+<p class="sub">Stuur een opname naar de computer; die verschijnt daar als interview.</p>
 
 <div class="card">
   <div class="row">
     <div><label for="code">Code (staat op de computer)</label><input type="tel" id="code" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"></div>
   </div>
-  <label for="pname" style="margin-top:12px">Projectnaam (optioneel)</label>
+  <label for="pname" style="margin-top:12px">Naam van het interview (optioneel)</label>
   <input type="text" id="pname" maxlength="80" placeholder="bijv. interview R04">
+  <div id="studyRow" class="hidden"><label for="study" style="margin-top:12px">Onderzoek (optioneel)</label>
+  <select id="study"><option value="">Zonder onderzoek</option></select></div>
   <label class="sw"><input type="checkbox" id="auto" checked> Direct transcriberen met de standaardinstellingen</label>
 </div>
 
@@ -90,7 +92,7 @@
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const codeEl = $('code'), nameEl = $('pname'), autoEl = $('auto'), zone = $('zone'), fileEl = $('file'), list = $('list');
+const codeEl = $('code'), nameEl = $('pname'), autoEl = $('auto'), studyEl = $('study'), zone = $('zone'), fileEl = $('file'), list = $('list');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt = b => b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : b < 1073741824 ? (b / 1048576).toFixed(1) + ' MB' : (b / 1073741824).toFixed(2) + ' GB';
 const mmss = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -102,6 +104,22 @@ else { let c = null; try { c = localStorage.code; } catch (e) {} codeEl.value = 
 codeEl.addEventListener('input', () => { try { localStorage.code = codeEl.value; } catch (e) {} });
 $('target').innerHTML = `Versturen naar <b>${esc(location.host)}</b> · zelfde wifi vereist · <a href="/">open Sift</a>`;
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+/* ---------- onderzoeken (alleen als de code klopt) ---------- */
+let studiesFor = null;
+async function loadStudies() {
+  if (!/^\d{4}$/.test(codeEl.value) || studiesFor === codeEl.value) return;
+  studiesFor = codeEl.value;
+  try {
+    const r = await fetch('/api/studies', { headers: { 'X-Sift-Code': codeEl.value } });
+    if (!r.ok) return;
+    const st = await r.json();
+    studyEl.innerHTML = '<option value="">Zonder onderzoek</option>' + st.map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+    $('studyRow').classList.toggle('hidden', !st.length);
+  } catch (e) {}
+}
+codeEl.addEventListener('input', loadStudies);
+loadStudies();
 
 function needCode() {
   if (/^\d{4}$/.test(codeEl.value)) return true;
@@ -128,7 +146,7 @@ function upload(f, name) {
     list.prepend(li);
     const bar = li.querySelector('i'), msg = li.querySelector('.msg');
     const fd = new FormData();
-    fd.append('file', f, f.name); fd.append('name', name || ''); fd.append('autostart', autoEl.checked ? '1' : '0');
+    fd.append('file', f, f.name); fd.append('name', name || ''); fd.append('autostart', autoEl.checked ? '1' : '0'); fd.append('study_id', studyEl.value || '');
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/api/drop');
     xhr.setRequestHeader('X-Sift-Code', codeEl.value);
@@ -138,7 +156,7 @@ function upload(f, name) {
       if (xhr.status === 200) {
         let r = {}; try { r = JSON.parse(xhr.responseText); } catch (e) {}
         li.classList.add('ok');
-        msg.innerHTML = `Ontvangen als project <b>${esc(r.name || '')}</b>${r.autostart ? ', transcriptie gestart' : ''}. <a href="/?code=${encodeURIComponent(codeEl.value)}#p=${encodeURIComponent(r.id || '')}&v=pipeline">Open in Sift</a>`;
+        msg.innerHTML = `Ontvangen als interview <b>${esc(r.name || '')}</b>${r.autostart ? ', verwerking gestart' : ''}. <a href="/?code=${encodeURIComponent(codeEl.value)}#p=${encodeURIComponent(r.id || '')}&v=process">Open in Sift</a>`;
       } else {
         li.classList.add('err');
         msg.textContent = { 401: 'Verkeerde code', 403: 'Sift is op de computer niet opengesteld voor het netwerk (knop Telefoon)', 413: 'Te groot (max 2 GB)', 429: 'Te veel verkeerde codes, wacht een minuut' }[xhr.status] || `Mislukt (${xhr.status})`;

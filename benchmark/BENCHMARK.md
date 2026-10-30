@@ -1,5 +1,10 @@
 # Benchmark 29 oktober 2026
 
+> **Beperkte proef.** Eén opname, één fragment van vijf minuten, geen handmatig gecontroleerd referentietranscript.
+> De cijfers hieronder zijn gemiddelde modelscores, aantallen woorden onder een drempel en onderlinge verschillen
+> tussen modelruns; het zijn géén gemeten woordfoutpercentages en zeggen niets over de werkelijke transcriptiekwaliteit.
+> Voor zo'n uitspraak is een onafhankelijk nagekeken referentietranscript nodig.
+
 Fragment: 05:00 – 10:00 uit het interview (WhatsApp-export, AAC mono 48 kHz, 52:38 totaal).
 Hardware: RTX 2000 Ada 8 GB (float16), i7-13700H (int8), 32 GB RAM. faster-whisper 1.2.1, beam 5, Silero VAD, woordtijdstempels.
 Er is geen handmatig referentietranscript, dus "kwaliteit" is hier: gemiddelde woordzekerheid, aantal onzekere woorden, en steekproefsgewijs meelezen.

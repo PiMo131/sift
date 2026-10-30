@@ -10,9 +10,34 @@ Sift draait volledig op je eigen computer. Er zijn twee manieren om het op Windo
 | Internet nodig bij de eerste transcriptie | ja, voor de Whisper-modellen (large-v3: 3 GB) | ja, tenzij je de modellen kopieert (zie onder) |
 | Kiest zelf CPU of GPU | ja, automatisch | nee: CPU- of GPU-bundel |
 
-Vereisten: Windows 10 of 11 (64-bit), 5 tot 10 GB vrije schijfruimte. Voor GPU-versnelling een NVIDIA-kaart met een
-recent stuurprogramma; CUDA zelf hoeft niet geïnstalleerd te worden. Zonder NVIDIA-GPU werkt alles op de CPU
-(Whisper large-v3 ongeveer 1,5× realtime op een moderne laptop).
+## Wat je nodig hebt
+
+| | Minimaal | Aanbevolen |
+|---|---|---|
+| Windows | 10 (64-bit) | 11 |
+| Processor | 4 kernen | 8 kernen of meer |
+| Werkgeheugen | 8 GB | 16 GB |
+| Grafische kaart | niet nodig (verwerking op de processor) | NVIDIA met 6 GB of meer videogeheugen en een recent stuurprogramma (CUDA zelf hoeft niet geïnstalleerd te worden) |
+| Schijfruimte | 5 GB voor Sift en de Python-onderdelen, plus de spraakmodellen | 10 GB vrij |
+| Internet | bij de installatie (lichte installer) en bij het eerste gebruik, voor het downloaden van de spraakmodellen | |
+
+Spraakmodellen worden bij het eerste gebruik eenmalig gedownload van Hugging Face en daarna lokaal bewaard
+(`%USERPROFILE%\.cache\huggingface\hub`):
+
+| Model | Download |
+|---|---|
+| Whisper large-v3 (beste kwaliteit) | ± 3,1 GB |
+| Whisper large-v3-turbo (snel) | ± 1,6 GB |
+| Whisper medium (licht) | ± 1,5 GB |
+| SpeechBrain ECAPA (sprekers) | ± 0,1 GB |
+
+Sift kiest zelf een passende standaard voor je computer: met een NVIDIA-GPU large-v3 + turbo, zonder GPU alleen turbo.
+Op de processor duurt een uur opname ongeveer 25 tot 40 minuten (turbo) of 40 tot 60 minuten (large-v3); met een GPU
+enkele minuten. De interface laat zien wanneer er gedownload wordt en wanneer er herkend wordt.
+
+Zet de projectmap bij voorkeur **niet** in een OneDrive- of andere gesynchroniseerde map: synchronisatie houdt
+bestanden soms kort vast. Sift probeert het schrijven dan opnieuw, maar het blijft trager en foutgevoeliger. De
+projectmap is instelbaar via de omgevingsvariabele `SIFT_PROJECTS`; ffmpeg vindt Sift ook via `SIFT_FFMPEG`.
 
 ## Lichte installer
 
@@ -131,3 +156,8 @@ Waarom Python 3.12 en niet 3.13: niet alle binaire afhankelijkheden (onder ander
 wheels voor 3.13; faster-whisper, ctranslate2, torch en speechbrain hebben ze allemaal voor 3.12. Waarom een
 gecompileerde launcher en geen `.cmd` of PowerShell-naar-exe: een echte exe krijgt een icoon in de taakbalk, en
 ps2exe-bestanden worden vaak door virusscanners aangezien voor malware.
+
+## Zonder installer: starten vanuit de broncode
+
+Zie de README onder "Starten vanuit de broncode" en "Voor ontwikkelaars": `git clone`, `.\start.ps1` (maakt een
+virtuele omgeving en installeert alles). Vereist Python 3.10 of nieuwer en ffmpeg.
