@@ -189,6 +189,9 @@ async function loadHome() {
   const groups = [...S.studies.map(s => ({ study: s, items: S.projects.filter(p => p.study_id === s.id) })), { study: null, items: S.projects.filter(p => !p.study_id || !S.studies.some(s => s.id === p.study_id)) }];
   const item = p => `<button class="item" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${esc(p.status_label)}"><div><b>${esc(p.name)}</b><div style="font-size:12px;color:var(--muted)">Volgende stap: ${esc(p.next_action)}${p.review ? ` · nagekeken ${p.review.reviewed}/${p.review.segments}` : ''}${p.fragment && (p.fragment.start != null || p.fragment.end != null) ? ' · fragment' : ''}</div></div><div class="meta"><span class="status ${esc(p.review_status === 'checked' ? 'checked' : p.status)}">${esc(p.status_label)}</span><div>${p.duration ? fmtT(p.duration) : ''}</div></div></button>`;
   const studyBlock = g => `<div class="study"><div class="sh">${g.study ? `<b>${esc(g.study.name)}</b><span class="meta">${g.items.length} interview(s) · ${g.study.checked} gecontroleerd</span><button class="btn small" data-study="${esc(g.study.id)}">Instellingen</button>` : `<b>Zonder onderzoek</b><span class="meta">${g.items.length} interview(s)</span>`}</div><div class="plist">${g.items.length ? g.items.map(item).join('') : '<div class="sub" style="padding:10px 12px;margin:0">Nog geen interviews.</div>'}</div></div>`;
+  // een half ingevuld formulier overleeft een herbouw van de startpagina (bijv. na het opslaan van een onderzoek)
+  const keep = {}; ['newName', 'newStudySel', 'newLang', 'newSpk', 'newTerms', 'tryStart', 'tryLen'].forEach(id => { const el = $('#' + id); if (el && el.value) keep[id] = el.value; });
+  const keepTry = $('#tryFirst')?.checked;
   const modelOpt = ([id, m]) => { const avail = m.available; return `<label class="cb ${avail ? '' : 'na'}"><input type="checkbox" class="nModel" value="${id}" ${rec.models.includes(id) ? 'checked' : ''} ${avail ? '' : 'disabled'}> ${esc(m.label)} <small>· ${esc(m.note)}${m.downloaded ? '' : ` · eenmalige download ± ${m.size_gb} GB`}${avail ? '' : ' · niet geïnstalleerd'}</small></label>`; };
   $('#home').innerHTML = `
   <div class="grid2">
@@ -239,6 +242,8 @@ async function loadHome() {
   drop.ondragleave = () => drop.classList.remove('over');
   drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); };
   $('#fileInput').onchange = e => { if (e.target.files[0]) setFile(e.target.files[0]); };
+  Object.entries(keep).forEach(([id, v]) => { const el = $('#' + id); if (el) el.value = v; });
+  if (keepTry) { $('#tryFirst').checked = true; $('#tryBox').style.display = ''; }
   if (newFile) setFile(newFile);
   $('#btnCreate').onclick = createInterview;
 }
