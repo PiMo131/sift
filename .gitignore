@@ -30,3 +30,5 @@ transcript_rescue_*.json
 projects_test/
 # de fictieve demo-opname mag wél mee (gegenereerd met demo/generate_demo.py)
 !demo/demo_interview.m4a
+# de demovideo voor de README mag wel mee (gemaakt met demo/record_demo.py)
+!docs/demo.mp4

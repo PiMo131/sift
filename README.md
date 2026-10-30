@@ -46,6 +46,10 @@ zachte passage, een stilte van vier seconden en een zin die zo zacht en snel is 
 2. Kies onder *Nieuw interview* het bestand `demo/demo_interview.m4a`, taal Nederlands, 2 sprekers, en klik *Transcript maken*.
 3. Na een halve tot enkele minuten (afhankelijk van je computer) staat het transcript klaar. Gebruik *Volgend aandachtspunt* om de passages te bekijken die aandacht nodig hebben; bij ongeveer 1:29 staat *Mogelijk ontbrekende tekst — luister terug*: dat is de weggelaten zin uit het script.
 
+![Demo: nakijken in Sift](docs/demo.gif)
+
+Een demovideo van 2,5 minuut (startpagina, verwerking, nakijken, modellen vergelijken, exporteren, telefoon) staat in [docs/demo.mp4](docs/demo.mp4); hij is gemaakt met `demo/record_demo.py`.
+
 Alle resultaten in deze README en in `docs/` zijn gemaakt met dit demo-interview; de screenshots zijn met
 `docs/screenshots.py` gegenereerd. Er is geen echt interviewmateriaal gebruikt.
 
